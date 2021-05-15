@@ -1,13 +1,11 @@
 package config
 
 type AppConfig struct {
-	Version    string        `yaml:"version"`
-	Env        string        `yaml:"env"`
+	Version    string         `yaml:"version"`
+	Env        string         `yaml:"env"`
 	Httpd      *HttpdConfig   `yaml:"httpd"`
-	RecordDir  string        `yaml:"recordDir"`
-	LinuxUser  string        `yaml:"linuxUser"`
-	PoolNum    int           `yaml:"poolNum"`
 	Log        *LogConfig     `yaml:"log"`
+	Mysql      *MysqlConfig   `yaml:"mysql"`
 }
 
 type HttpdConfig struct {
@@ -21,4 +19,13 @@ type LogConfig struct {
 	Format    string
 	RetainDay int8
 	Level     string
+}
+
+type MysqlConfig struct {
+	Host        string
+	Port        int
+	Db          string
+	User        string
+	Password    string
+	Charset     string
 }
