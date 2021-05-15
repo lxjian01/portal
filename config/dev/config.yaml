@@ -1,0 +1,16 @@
+version: "1.0.0"
+env: "dev"
+httpd:
+  host: "0.0.0.0"
+  port: 8010
+recordDir: "/data/records/"
+linuxUser: "root"
+poolNum: 100
+log:
+  dir: "/tmp/logs"
+  name: "webshell.log"
+  format: ""
+  retainDay: 3
+  Level: "INFO"
+
+
