@@ -24,9 +24,9 @@ var rootCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}()
-		fmt.Println("Starting init system log")
+		fmt.Println("Starting init sysmgr log")
 		log.Init(conf.Log)
-		fmt.Println("Init system log ok")
+		fmt.Println("Init sysmgr log ok")
 
 		fmt.Println("Starting init gorm")
 		gorm.InitDB()

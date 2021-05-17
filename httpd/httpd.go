@@ -17,6 +17,7 @@ func StartHttpdServer(c *config.HttpdConfig) {
 	router.Use(middlewares.Auth(), gin.Recovery())
 	// 添加路由
 	routers.UserRoutes(router)      //Added all user routers
+	routers.SysmgrRoutes(router)      //Added system mgr routers
 	// 拼接host
 	Host := c.Host
 	Port := strconv.Itoa(c.Port)
