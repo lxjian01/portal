@@ -104,30 +104,41 @@ func GetMenuList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
+func GetParentMenuList(c *gin.Context){
+	resp := &utils.Response{}
+	data, err := sysmgr.GetParentMenuList()
+	if err != nil {
+		resp.ToMsgBadRequest(c, err.Error())
+		return
+	}
+	resp.Data = data
+	resp.ToSuccess(c)
+}
+
 func GetMenuPage(c *gin.Context){
 	resp := &utils.Response{}
-	obj, isExist := c.GetQuery("page")
+	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
-		resp.ToMsgBadRequest(c, "参数page不能为空")
+		resp.ToMsgBadRequest(c, "参数pageIndex不能为空")
 		return
 	}
 	pageIndex, err := strconv.Atoi(obj)
 	if err != nil {
-		resp.ToMsgBadRequest(c, "参数page必须是整数")
+		resp.ToMsgBadRequest(c, "参数pageIndex必须是整数")
 		return
 	}
-	obj, isExist = c.GetQuery("page_size")
+	obj, isExist = c.GetQuery("pageSize")
 	if isExist != true {
-		resp.ToMsgBadRequest(c, "参数page_size不能为空")
+		resp.ToMsgBadRequest(c, "参数pageSize不能为空")
 		return
 	}
 	pageSize, err := strconv.Atoi(obj)
 	if err != nil {
-		resp.ToMsgBadRequest(c, "参数page_size必须是整数")
+		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	keywords, _ := c.GetQuery("keywords")
-	data, err := sysmgr.GetMenuPage(pageIndex, pageSize, keywords)
+	title, _ := c.GetQuery("title")
+	data, err := sysmgr.GetMenuPage(pageIndex, pageSize, title)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

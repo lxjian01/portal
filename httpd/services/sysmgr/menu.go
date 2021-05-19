@@ -42,16 +42,22 @@ func GetMenuDetail(id int) (*models.Menu, error) {
 
 func GetMenuList() (*[]models.Menu, error) {
 	dataList := make([]models.Menu, 0)
-	gorm.GetOrmDB().Table("menu").Find(&dataList)
+	gorm.GetOrmDB().Table("menu").Select("id","pid","title","path","icon","sort").Find(&dataList)
 	return &dataList, nil
 }
 
-func GetMenuPage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
+func GetParentMenuList() (*[]models.Menu, error) {
+	dataList := make([]models.Menu, 0)
+	gorm.GetOrmDB().Table("menu").Select("id","pid","title").Where("pid = 0").Find(&dataList)
+	return &dataList, nil
+}
+
+func GetMenuPage(pageIndex int, pageSize int, title string) (*utils.PageData, error) {
 	dataList := make([]models.Menu, 0)
 	tx := gorm.GetOrmDB().Table("menu")
-	if keywords != "" {
-		likeStr := "%" + keywords + "%"
-		tx.Where("title like ? or path like ?", likeStr)
+	if title != "" {
+		likeStr := "%" + title + "%"
+		tx.Where("title like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

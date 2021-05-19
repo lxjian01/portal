@@ -6,10 +6,10 @@ import (
 )
 
 type PageData struct {
-	Data interface{} `json:"results"`
-	Total int64 `json:"count"`
-	PageIndex int `json:"page_index"`
-	PageSize int `json:"page_size"`
+	Data interface{} `json:"data"`
+	Total int64 `json:"total"`
+	PageIndex int `json:"pageIndex"`
+	PageSize int `json:"pageSize"`
 }
 
 func GetPageData(tx *gorm.DB, pageIndex int, pageSize int,data interface{}) (*PageData, error) {

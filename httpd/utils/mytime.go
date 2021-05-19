@@ -1,41 +1,41 @@
 package utils
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
-const myTimeFormat string = "2006-01-02 15:04:05"
+const timeFormat string = "2006-01-02 15:04:05"
 
 //MyTime 自定义时间
 
-type MyTime time.Time
-
-func (mt MyTime) MarshalJSON() ([]byte, error) {
-	b := make([]byte, 0, len(myTimeFormat)+2)
-	b = append(b, '"')
-	b = time.Time(mt).AppendFormat(b, myTimeFormat)
-	b = append(b, '"')
-	return b, nil
+type MyTime struct {
+	time.Time
 }
 
-func (mt *MyTime) UnmarshalJSON(b []byte) error {
-	now, err := time.ParseInLocation(`"`+myTimeFormat+`"`, string(b), time.Local)
-	*mt = MyTime(now)
-	return err
+func (t MyTime) MarshalJSON() ([]byte, error) {
+	formatted := fmt.Sprintf("\"%s\"", t.Format(timeFormat))
+	return []byte(formatted), nil
 }
 
-func (mt MyTime) String() string {
-	return time.Time(mt).Format(myTimeFormat)
+func (t MyTime) Value() (driver.Value, error) {
+	var zeroTime time.Time
+	if t.Time.UnixNano() == zeroTime.UnixNano() {
+		return nil, nil
+	}
+	return t.Time, nil
 }
 
-func (mt MyTime)Now() MyTime {
-	return MyTime(time.Now())
+func (t *MyTime) Scan(v interface{}) error {
+	value, ok := v.(time.Time)
+	if ok {
+		*t = MyTime{Time: value}
+		return nil
+	}
+	return fmt.Errorf("can not convert %v to timestamp", v)
 }
 
-func (mt MyTime)ParseTime(t time.Time) MyTime {
-	return MyTime(t)
-}
-
-func (mt MyTime) format() string {
-	return time.Time(mt).Format(myTimeFormat)
+func (t MyTime) Now() MyTime {
+	return MyTime{Time: time.Now()}
 }
