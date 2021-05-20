@@ -19,7 +19,7 @@ func AddMenu(c *gin.Context){
 	}
 	u.CreateUser = middlewares.GetLoginUser().UserCode
 	u.UpdateUser = middlewares.GetLoginUser().UserCode
-	var myTime utils.MyTime
+	var myTime models.MyTime
 	u.CreateTime = myTime.Now()
 	u.UpdateTime = myTime.Now()
 	_, err := sysmgr.AddMenu(&u)
@@ -40,7 +40,7 @@ func UpdateMenu(c *gin.Context){
 		return
 	}
 	u.UpdateUser = middlewares.GetLoginUser().UserCode
-	var myTime utils.MyTime
+	var myTime models.MyTime
 	u.UpdateTime = myTime.Now()
 	err := sysmgr.UpdateMenu(&u)
 	if err != nil {

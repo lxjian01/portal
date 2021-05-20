@@ -1,9 +1,17 @@
-package utils
+package models
 
 import (
 	"database/sql/driver"
 	"time"
 )
+
+type BaseModel struct {
+	Id        int `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
+	CreateUser string `gorm:"column:create_user;type:varchar(64);default='system'" json:"createUser"`
+	CreateTime MyTime `gorm:"column:create_time;type:datetime" json:"createTime"`
+	UpdateUser string `gorm:"column:update_user;type:varchar(64);default='system'" json:"updateUser"`
+	UpdateTime MyTime `gorm:"column:update_time;type:datetime" json:"updateTime"`
+}
 
 const TimeFormat = "2006-01-02 15:04:05"
 
