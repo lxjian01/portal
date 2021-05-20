@@ -10,6 +10,14 @@ type Menu struct {
 	Sort uint8 `gorm:"column:sort;type:tinyint;default=1" json:"sort" form:"sort" binding:""`
 }
 
+type User struct {
+	BaseModel
+	UserCode   string `gorm:"column:user_code;type:varchar(64)" json:"userCode" form:"userCode" binding:"required"`
+	UserName   string `gorm:"column:user_name;type:varchar(64)" json:"userName" form:"userName" binding:"required"`
+	Phone   string `gorm:"column:phone;type:varchar(32)" json:"phone" form:"phone" binding:"required"`
+	Email   string `gorm:"column:email;type:varchar(64)" json:"email" form:"email" binding:"required"`
+}
+
 
 type LoginUser struct {
 	Uid   string      `json:"uid"`
