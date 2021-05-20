@@ -20,5 +20,12 @@ type User struct {
 
 type Role struct {
 	BaseModel
+	RoleCode   string `gorm:"column:role_code;type:varchar(64)" json:"roleCode" form:"roleCode" binding:"required"`
 	RoleName   string `gorm:"column:role_name;type:varchar(64)" json:"roleName" form:"roleName" binding:"required"`
+}
+
+type UserRole struct {
+	BaseModel
+	UserCode   string `gorm:"column:user_code;type:varchar(64)" json:"userCode" form:"userCode" binding:"required"`
+	RoleCode   string `gorm:"column:role_code;type:varchar(64)" json:"roleCode" form:"roleCode" binding:"required"`
 }
