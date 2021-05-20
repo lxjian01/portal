@@ -8,7 +8,7 @@ import (
 )
 
 func AddMenu(m *models.Menu) (int, error) {
-	err := gorm.GetOrmDB().Table("menu").Create(m).Error
+	err := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","create_user","create_time","update_user","update_time").Create(m).Error
 	if err != nil {
 		return 0, err
 	}
@@ -62,6 +62,17 @@ func GetMenuPage(pageIndex int, pageSize int, title string) (*utils.PageData, er
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
 		return nil, err
+	}
+
+	parentList := make([]models.Menu, 0)
+	gorm.GetOrmDB().Table("menu").Select("id","pid","title").Where("pid = 0").Find(&parentList)
+	for index, item := range dataList {
+		for _, pitem := range parentList {
+			if item.Pid == pitem.Id {
+				value := pitem.Title
+				dataList[index].PTitle = value
+			}
+		}
 	}
 	pageData.Data = &dataList
 	return pageData, nil

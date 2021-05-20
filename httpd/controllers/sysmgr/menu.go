@@ -136,6 +136,7 @@ func GetMenuPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, err.Error())
 		return
 	}
+
 	resp.Data = data
 	resp.ToSuccess(c)
 }
