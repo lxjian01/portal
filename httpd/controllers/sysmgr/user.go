@@ -12,39 +12,39 @@ import (
 
 func AddUser(c *gin.Context){
 	var resp utils.Response
-	var u models.User
-	if err := c.ShouldBindJSON(&u);err != nil{
+	var m models.User
+	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
-	u.CreateUser = middlewares.GetLoginUser().UserCode
-	u.UpdateUser = middlewares.GetLoginUser().UserCode
+	m.CreateUser = middlewares.GetLoginUser().UserCode
+	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	var myTime models.MyTime
-	u.CreateTime = myTime.Now()
-	u.UpdateTime = myTime.Now()
-	_, err := sysmgr.AddUser(&u)
+	m.CreateTime = myTime.Now()
+	m.UpdateTime = myTime.Now()
+	_, err := sysmgr.AddUser(&m)
 	if err != nil {
 		log.Errorf("Add system user error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
-	resp.Data = gin.H{"id": u.Id}
+	resp.Data = gin.H{"id": m.Id}
 	resp.ToSuccess(c)
 }
 
 func UpdateUser(c *gin.Context){
 	var resp utils.Response
-	var u models.User
-	if err := c.ShouldBindJSON(&u);err != nil{
+	var m models.User
+	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
-	u.UpdateUser = middlewares.GetLoginUser().UserCode
+	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	var myTime models.MyTime
-	u.UpdateTime = myTime.Now()
-	err := sysmgr.UpdateUser(&u)
+	m.UpdateTime = myTime.Now()
+	err := sysmgr.UpdateUser(&m)
 	if err != nil {
-		log.Errorf("Update system user id=%d error %s", u.Id, err.Error())
+		log.Errorf("Update system user id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}

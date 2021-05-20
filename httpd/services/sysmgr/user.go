@@ -35,9 +35,9 @@ func DeleteUser(id int) (int64, error) {
 }
 
 func GetUserDetail(id int) (*models.User, error) {
-	var user models.User
-	gorm.GetOrmDB().Table("user").Where("id = ?", id).First(&user)
-	return &user, nil
+	var m models.User
+	gorm.GetOrmDB().Table("user").Where("id = ?", id).First(&m)
+	return &m, nil
 }
 
 func GetUserList() (*[]models.User, error) {

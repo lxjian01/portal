@@ -35,9 +35,9 @@ func DeleteMenu(id int) (int64, error) {
 }
 
 func GetMenuDetail(id int) (*models.Menu, error) {
-	var menu models.Menu
-	gorm.GetOrmDB().Table("menu").Where("id = ?", id).First(&menu)
-	return &menu, nil
+	var m models.Menu
+	gorm.GetOrmDB().Table("menu").Where("id = ?", id).First(&m)
+	return &m, nil
 }
 
 func GetMenuList() (*[]models.Menu, error) {

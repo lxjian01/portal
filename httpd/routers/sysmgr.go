@@ -24,5 +24,13 @@ func SysmgrRoutes(route *gin.Engine) {
 		user.GET("/user/list", sysmgr.GetUserList)
 		user.GET("/user/page", sysmgr.GetUserPage)
 		user.GET("/user/detail/:id", sysmgr.GetUserDetail)
+
+		// role
+		user.POST("/role", sysmgr.AddRole)
+		user.PUT("/role/:id", sysmgr.UpdateRole)
+		user.DELETE("/role/:id", sysmgr.DeleteRole)
+		user.GET("/role/list", sysmgr.GetRoleList)
+		user.GET("/role/page", sysmgr.GetRolePage)
+		user.GET("/role/detail/:id", sysmgr.GetRoleDetail)
 	}
 }

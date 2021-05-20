@@ -10,9 +10,9 @@ import (
 	"strconv"
 )
 
-func AddMenu(c *gin.Context){
+func AddRole(c *gin.Context){
 	var resp utils.Response
-	var m models.Menu
+	var m models.Role
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
@@ -22,9 +22,9 @@ func AddMenu(c *gin.Context){
 	var myTime models.MyTime
 	m.CreateTime = myTime.Now()
 	m.UpdateTime = myTime.Now()
-	_, err := sysmgr.AddMenu(&m)
+	_, err := sysmgr.AddRole(&m)
 	if err != nil {
-		log.Errorf("Add system menu error %s",err.Error())
+		log.Errorf("Add system role error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -32,9 +32,9 @@ func AddMenu(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMenu(c *gin.Context){
+func UpdateRole(c *gin.Context){
 	var resp utils.Response
-	var m models.Menu
+	var m models.Role
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
@@ -42,16 +42,16 @@ func UpdateMenu(c *gin.Context){
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	var myTime models.MyTime
 	m.UpdateTime = myTime.Now()
-	err := sysmgr.UpdateMenu(&m)
+	err := sysmgr.UpdateRole(&m)
 	if err != nil {
-		log.Errorf("Update system menu id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update system role id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteMenu(c *gin.Context){
+func DeleteRole(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -59,16 +59,16 @@ func DeleteMenu(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = sysmgr.DeleteMenu(id)
+	_, err = sysmgr.DeleteRole(id)
 	if err != nil {
-		log.Errorf("Delete system menu id=%d error %s", id, err.Error())
+		log.Errorf("Delete system role id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetMenuDetail(c *gin.Context){
+func GetRoleDetail(c *gin.Context){
 	resp := &utils.Response{}
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -76,9 +76,9 @@ func GetMenuDetail(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	data, err := sysmgr.GetMenuDetail(id)
+	data, err := sysmgr.GetRoleDetail(id)
 	if err != nil {
-		log.Errorf("Get system menu id=%d error %s", id, err.Error())
+		log.Errorf("Get system role id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -86,9 +86,9 @@ func GetMenuDetail(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetMenuList(c *gin.Context){
+func GetRoleList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := sysmgr.GetMenuList()
+	data, err := sysmgr.GetRoleList()
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -97,18 +97,7 @@ func GetMenuList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetParentMenuList(c *gin.Context){
-	resp := &utils.Response{}
-	data, err := sysmgr.GetParentMenuList()
-	if err != nil {
-		resp.ToMsgBadRequest(c, err.Error())
-		return
-	}
-	resp.Data = data
-	resp.ToSuccess(c)
-}
-
-func GetMenuPage(c *gin.Context){
+func GetRolePage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -131,7 +120,7 @@ func GetMenuPage(c *gin.Context){
 		return
 	}
 	title, _ := c.GetQuery("title")
-	data, err := sysmgr.GetMenuPage(pageIndex, pageSize, title)
+	data, err := sysmgr.GetRolePage(pageIndex, pageSize, title)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
