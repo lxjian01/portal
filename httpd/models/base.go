@@ -2,67 +2,50 @@ package models
 
 import (
 	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
 type BaseModel struct {
 	Id        int `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
-	CreateUser string `gorm:"column:create_user;type:varchar(64);default='system'" json:"createUser"`
-	CreateTime MyTime `gorm:"column:create_time;type:datetime" json:"createTime"`
-	UpdateUser string `gorm:"column:update_user;type:varchar(64);default='system'" json:"updateUser"`
-	UpdateTime MyTime `gorm:"column:update_time;type:datetime" json:"updateTime"`
+
 }
 
-const TimeFormat = "2006-01-02 15:04:05"
+const myTimeFormat string = "2006-01-02 15:04:05"
 
 //MyTime 自定义时间
 
-type MyTime time.Time
-
-func (mt *MyTime) UnmarshalJSON(data []byte) (err error) {
-	if len(data) == 2 {
-		*mt = MyTime(time.Time{})
-		return
-	}
-
-	now, err := time.Parse(`"`+TimeFormat+`"`, string(data))
-	*mt = MyTime(now)
-	return
+type MyTime struct {
+	time.Time
 }
 
 func (mt MyTime) MarshalJSON() ([]byte, error) {
-	b := make([]byte, 0, len(TimeFormat)+2)
-	b = append(b, '"')
-	b = time.Time(mt).AppendFormat(b, TimeFormat)
-	b = append(b, '"')
-	return b, nil
+	formatted := fmt.Sprintf("\"%s\"", mt.Format(myTimeFormat))
+	return []byte(formatted), nil
 }
 
 func (mt MyTime) Value() (driver.Value, error) {
-	if mt.String() == "0001-01-01 00:00:00" {
+	var zeroTime time.Time
+	if mt.Time.UnixNano() == zeroTime.UnixNano() {
 		return nil, nil
 	}
-	return []byte(time.Time(mt).Format(TimeFormat)), nil
+	return mt.Time, nil
 }
 
 func (mt *MyTime) Scan(v interface{}) error {
-	tTime, _ := time.Parse("2006-01-02 15:04:05 +0800 CST", v.(time.Time).String())
-	*mt = MyTime(tTime)
-	return nil
+	value, ok := v.(time.Time)
+	if ok {
+		*mt = MyTime{Time: value}
+		return nil
+	}
+	return fmt.Errorf("can not convert %v to timestamp", v)
 }
-
-func (mt MyTime) String() string {
-	return time.Time(mt).Format(TimeFormat)
+func (mt *MyTime) UnmarshalJSON(b []byte) error {
+	now, err := time.ParseInLocation(`"`+myTimeFormat+`"`, string(b), time.Local)
+	*mt = MyTime{Time: now}
+	return err
 }
 
 func (mt MyTime) Now() MyTime {
-	return MyTime(time.Now())
-}
-
-func (mt MyTime) ParseTime(t time.Time) MyTime {
-	return MyTime(t)
-}
-
-func (mt MyTime) format() string {
-	return time.Time(mt).Format(TimeFormat)
+	return MyTime{Time: time.Now()}
 }
