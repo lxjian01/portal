@@ -8,7 +8,7 @@ type Menu struct {
 	Title   string `gorm:"column:title;type:varchar(64)" json:"title" form:"title" binding:"required"`
 	Path      string `gorm:"column:path;type:varchar(64)" json:"path" form:"path" binding:"required"`
 	Icon    string `gorm:"column:icon;type:varchar(64)" json:"icon" form:"icon" binding:""`
-	Sort uint8 `gorm:"column:sort;type:tinyint;default='1'" json:"sort" form:"sort"`
+	Sort uint8 `gorm:"column:sort;type:tinyint;default='1'" json:"sort" form:"sort" binding:""`
 	CreateUser string `gorm:"column:create_user;type:varchar(64);default='system'" json:"createUser"`
 	CreateTime utils.MyTime `gorm:"column:create_time;type:datetime" json:"createTime"`
 	UpdateUser string `gorm:"column:update_user;type:varchar(64);default='system'" json:"updateUser"`

@@ -2,40 +2,59 @@ package utils
 
 import (
 	"database/sql/driver"
-	"fmt"
 	"time"
 )
 
-const timeFormat string = "2006-01-02 15:04:05"
+const TimeFormat = "2006-01-02 15:04:05"
 
 //MyTime 自定义时间
 
-type MyTime struct {
-	time.Time
+type MyTime time.Time
+
+func (mt *MyTime) UnmarshalJSON(data []byte) (err error) {
+	if len(data) == 2 {
+		*mt = MyTime(time.Time{})
+		return
+	}
+
+	now, err := time.Parse(`"`+TimeFormat+`"`, string(data))
+	*mt = MyTime(now)
+	return
 }
 
-func (t MyTime) MarshalJSON() ([]byte, error) {
-	formatted := fmt.Sprintf("\"%s\"", t.Format(timeFormat))
-	return []byte(formatted), nil
+func (mt MyTime) MarshalJSON() ([]byte, error) {
+	b := make([]byte, 0, len(TimeFormat)+2)
+	b = append(b, '"')
+	b = time.Time(mt).AppendFormat(b, TimeFormat)
+	b = append(b, '"')
+	return b, nil
 }
 
-func (t MyTime) Value() (driver.Value, error) {
-	var zeroTime time.Time
-	if t.Time.UnixNano() == zeroTime.UnixNano() {
+func (mt MyTime) Value() (driver.Value, error) {
+	if mt.String() == "0001-01-01 00:00:00" {
 		return nil, nil
 	}
-	return t.Time, nil
+	return []byte(time.Time(mt).Format(TimeFormat)), nil
 }
 
-func (t *MyTime) Scan(v interface{}) error {
-	value, ok := v.(time.Time)
-	if ok {
-		*t = MyTime{Time: value}
-		return nil
-	}
-	return fmt.Errorf("can not convert %v to timestamp", v)
+func (mt *MyTime) Scan(v interface{}) error {
+	tTime, _ := time.Parse("2006-01-02 15:04:05 +0800 CST", v.(time.Time).String())
+	*mt = MyTime(tTime)
+	return nil
 }
 
-func (t MyTime) Now() MyTime {
-	return MyTime{Time: time.Now()}
+func (mt MyTime) String() string {
+	return time.Time(mt).Format(TimeFormat)
+}
+
+func (mt MyTime) Now() MyTime {
+	return MyTime(time.Now())
+}
+
+func (mt MyTime) ParseTime(t time.Time) MyTime {
+	return MyTime(t)
+}
+
+func (mt MyTime) format() string {
+	return time.Time(mt).Format(TimeFormat)
 }

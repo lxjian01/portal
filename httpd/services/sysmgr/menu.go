@@ -16,7 +16,7 @@ func AddMenu(m *models.Menu) (int, error) {
 }
 
 func UpdateMenu(m *models.Menu) error {
-	result := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","update_user","update_time").Where(`"id" = ?`, m.Id).Updates(m)
+	result := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","update_user","update_time").Where("id = ?", m.Id).Updates(m)
 	if result.Error != nil {
 		return result.Error
 	}

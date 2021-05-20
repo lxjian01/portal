@@ -10,8 +10,8 @@ func SysmgrRoutes(route *gin.Engine) {
 	{
 		// system menu
 		user.POST("/menu", sysmgr.AddMenu)
-		user.PUT("/menu/:uid", sysmgr.UpdateMenu)
-		user.DELETE("/menu/:uid", sysmgr.DeleteMenu)
+		user.PUT("/menu/:id", sysmgr.UpdateMenu)
+		user.DELETE("/menu/:id", sysmgr.DeleteMenu)
 		user.GET("/menu/list", sysmgr.GetMenuList)
 		user.GET("/menu/parent_list", sysmgr.GetParentMenuList)
 		user.GET("/menu/page", sysmgr.GetMenuPage)

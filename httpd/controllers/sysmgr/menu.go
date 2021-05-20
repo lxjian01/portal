@@ -39,17 +39,10 @@ func UpdateMenu(c *gin.Context){
 		resp.ToError(c, err)
 		return
 	}
-	obj := c.Param("id")
-	id, err := strconv.Atoi(obj)
-	if err != nil {
-		resp.ToMsgBadRequest(c, "参数id必须是整数")
-		return
-	}
-	u.Id = id
 	u.UpdateUser = middlewares.GetLoginUser().UserCode
 	var myTime utils.MyTime
 	u.UpdateTime = myTime.Now()
-	err = sysmgr.UpdateMenu(&u)
+	err := sysmgr.UpdateMenu(&u)
 	if err != nil {
 		log.Errorf("Update system menu id=%d error %s", u.Id, err.Error())
 		resp.ToError(c, err)
