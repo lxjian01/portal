@@ -31,6 +31,5 @@ func SysmgrRoutes(route *gin.Engine) {
 		user.DELETE("/role/:id", sysmgr.DeleteRole)
 		user.GET("/role/list", sysmgr.GetRoleList)
 		user.GET("/role/page", sysmgr.GetRolePage)
-		user.GET("/role/:id", sysmgr.GetRoleDetail)
 	}
 }

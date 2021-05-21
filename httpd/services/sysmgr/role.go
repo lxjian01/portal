@@ -38,12 +38,6 @@ func DeleteRole(id int) error {
 	return err
 }
 
-func GetRoleDetail(id int) (*models.Role, error) {
-	var m models.Role
-	myorm.GetOrmDB().Table("role").Where("id = ?", id).First(&m)
-	return &m, nil
-}
-
 func GetRoleList() (*[]models.Role, error) {
 	dataList := make([]models.Role, 0)
 	myorm.GetOrmDB().Table("role").Select("id","role_code","role_name").Find(&dataList)

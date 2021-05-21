@@ -1,27 +1,27 @@
-package sysmgr
+package alarm
 
 import (
 	"github.com/gin-gonic/gin"
 	"portal/global/log"
 	"portal/httpd/middlewares"
 	"portal/httpd/models"
-	"portal/httpd/services/sysmgr"
+	"portal/httpd/services/alarm"
 	"portal/httpd/utils"
 	"strconv"
 )
 
-func AddRole(c *gin.Context){
+func AddAlarmGroup(c *gin.Context){
 	var resp utils.Response
-	var m models.Role
+	var m models.AlarmGroup
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := sysmgr.AddRole(&m)
+	_, err := alarm.AddAlarmGroup(&m)
 	if err != nil {
-		log.Errorf("Add system role error %s",err.Error())
+		log.Errorf("Add system alarm group error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddRole(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateRole(c *gin.Context){
+func UpdateAlarmGroup(c *gin.Context){
 	var resp utils.Response
-	var m models.Role
+	var m models.AlarmGroup
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := sysmgr.UpdateRole(&m)
+	err := alarm.UpdateAlarmGroup(&m)
 	if err != nil {
-		log.Errorf("Update system role id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update system alarm group id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteRole(c *gin.Context){
+func DeleteAlarmGroup(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,18 +54,18 @@ func DeleteRole(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	err = sysmgr.DeleteRole(id)
+	err = alarm.DeleteAlarmGroup(id)
 	if err != nil {
-		log.Errorf("Delete system role id=%d error %s", id, err.Error())
+		log.Errorf("Delete system alarm group id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetRoleList(c *gin.Context){
+func GetAlarmGroupList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := sysmgr.GetRoleList()
+	data, err := alarm.GetAlarmGroupList()
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -74,7 +74,7 @@ func GetRoleList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetRolePage(c *gin.Context){
+func GetAlarmGroupPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -97,7 +97,7 @@ func GetRolePage(c *gin.Context){
 		return
 	}
 	title, _ := c.GetQuery("title")
-	data, err := sysmgr.GetRolePage(pageIndex, pageSize, title)
+	data, err := alarm.GetAlarmGroupPage(pageIndex, pageSize, title)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
