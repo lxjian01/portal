@@ -1,13 +1,13 @@
 package sysmgr
 
 import (
-	"portal/global/gorm"
+	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
 )
 
 func AddRole(m *models.Role) (int, error) {
-	err := gorm.GetOrmDB().Table("role").Create(m).Error
+	err := myorm.GetOrmDB().Table("role").Create(m).Error
 	if err != nil {
 		return 0, err
 	}
@@ -15,13 +15,13 @@ func AddRole(m *models.Role) (int, error) {
 }
 
 func UpdateRole(m *models.Role) error {
-	result := gorm.GetOrmDB().Table("role").Select("role_name").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("role").Select("role_name").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
 func DeleteRole(id int) error {
 	// 开始事务
-	tx := gorm.GetOrmDB().Begin()
+	tx := myorm.GetOrmDB().Begin()
 	// find role
 	txRole := tx.Table("role").Where("id = ?", id)
 	var role models.Role
@@ -44,19 +44,19 @@ func DeleteRole(id int) error {
 
 func GetRoleDetail(id int) (*models.Role, error) {
 	var m models.Role
-	gorm.GetOrmDB().Table("role").Where("id = ?", id).First(&m)
+	myorm.GetOrmDB().Table("role").Where("id = ?", id).First(&m)
 	return &m, nil
 }
 
 func GetRoleList() (*[]models.Role, error) {
 	dataList := make([]models.Role, 0)
-	gorm.GetOrmDB().Table("role").Select("id","role_code","role_name").Find(&dataList)
+	myorm.GetOrmDB().Table("role").Select("id","role_code","role_name").Find(&dataList)
 	return &dataList, nil
 }
 
 func GetRolePage(pageIndex int, pageSize int, roleName string) (*utils.PageData, error) {
 	dataList := make([]models.Role, 0)
-	tx := gorm.GetOrmDB().Table("role")
+	tx := myorm.GetOrmDB().Table("role")
 	if roleName != "" {
 		likeStr := "%" + roleName + "%"
 		tx.Where("role_name like ?", likeStr)

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	appConf "portal/config"
 	globalConf "portal/global/config"
-	"portal/global/gorm"
+	"portal/global/myorm"
 	"portal/global/log"
 	"portal/httpd"
 )
@@ -28,10 +28,10 @@ var rootCmd = &cobra.Command{
 		log.Init(conf.Log)
 		fmt.Println("Init sysmgr log ok")
 
-		fmt.Println("Starting init gorm")
-		gorm.InitDB()
-		defer gorm.CloseDB()
-		fmt.Println("Init gorm ok")
+		fmt.Println("Starting init myorm")
+		myorm.InitDB()
+		defer myorm.CloseDB()
+		fmt.Println("Init myorm ok")
 
 		// init gin server
 		log.Info("Starting init gin server")

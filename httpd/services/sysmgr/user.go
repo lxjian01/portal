@@ -1,14 +1,14 @@
 package sysmgr
 
 import (
-	"portal/global/gorm"
+	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
 )
 
 func AddUser(m *models.User) (int, error) {
 	// 开始事务
-	tx := gorm.GetOrmDB().Begin()
+	tx := myorm.GetOrmDB().Begin()
 	// add user role
 	var userRoleList []models.UserRole
 	for _, item := range m.Roles{
@@ -42,7 +42,7 @@ func AddUser(m *models.User) (int, error) {
 
 func UpdateUser(m *models.User) error {
 	// 开始事务
-	tx := gorm.GetOrmDB().Begin()
+	tx := myorm.GetOrmDB().Begin()
 	// delete user role
 	result := tx.Table("user_role").Where("user_code = ?", m.UserCode).Delete(&models.Role{})
 	if result.Error != nil {
@@ -78,7 +78,7 @@ func UpdateUser(m *models.User) error {
 
 func DeleteUser(id int) error {
 	// 开始事务
-	tx := gorm.GetOrmDB().Begin()
+	tx := myorm.GetOrmDB().Begin()
 	// find user
 	txUser := tx.Table("user").Where("id = ?", id)
 	var user models.User
@@ -101,19 +101,19 @@ func DeleteUser(id int) error {
 
 func GetUserDetail(id int) (*models.User, error) {
 	var m models.User
-	gorm.GetOrmDB().Table("user").Where("id = ?", id).First(&m)
+	myorm.GetOrmDB().Table("user").Where("id = ?", id).First(&m)
 	return &m, nil
 }
 
 func GetUserList() (*[]models.User, error) {
 	dataList := make([]models.User, 0)
-	gorm.GetOrmDB().Table("user").Select("id","user_name","phone","email","weixin").Find(&dataList)
+	myorm.GetOrmDB().Table("user").Select("id","user_name","phone","email","weixin").Find(&dataList)
 	return &dataList, nil
 }
 
 func GetUserPage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.User, 0)
-	tx := gorm.GetOrmDB().Table("user")
+	tx := myorm.GetOrmDB().Table("user")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
 		tx.Where("user_code like ? or user_name like ?", likeStr)
