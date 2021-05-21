@@ -1,7 +1,6 @@
 package sysmgr
 
 import (
-	"errors"
 	"portal/global/gorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
@@ -17,21 +16,12 @@ func AddMenu(m *models.Menu) (int, error) {
 
 func UpdateMenu(m *models.Menu) error {
 	result := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","update_user").Where("id = ?", m.Id).Updates(m)
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return errors.New("更新失败")
-	}
-	return nil
+	return result.Error
 }
 
 func DeleteMenu(id int) (int64, error) {
 	result := gorm.GetOrmDB().Table("menu").Where("id = ?", id).Delete(&models.Menu{})
-	if result.Error != nil {
-		return 0, result.Error
-	}
-	return result.RowsAffected, nil
+	return result.RowsAffected, result.Error
 }
 
 func GetMenuDetail(id int) (*models.Menu, error) {

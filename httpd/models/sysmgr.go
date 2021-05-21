@@ -1,5 +1,10 @@
 package models
 
+import (
+	"database/sql/driver"
+	"encoding/json"
+)
+
 type Menu struct {
 	BaseModel
 	Pid         int `gorm:"column:pid;type:int;default=0" json:"pid" form:"pid"`
@@ -17,7 +22,21 @@ type User struct {
 	Phone   string `gorm:"column:phone;type:varchar(32)" json:"phone" form:"phone" binding:"required"`
 	Email   string `gorm:"column:email;type:varchar(64);not null" json:"email" form:"email" binding:"required,email"`
 	Weixin   string `gorm:"column:weixin;type:varchar(64)" json:"weixin" form:"weixin" binding:""`
+	Roles  []string               `gorm:"-" json:"roles"`
 }
+
+type Roles []string
+
+// Value 实现方法
+func (m Roles) Value() (driver.Value, error) {
+	return json.Marshal(m)
+}
+
+// Scan 实现方法
+func (m *Roles) Scan(data interface{}) error {
+	return json.Unmarshal(data.([]byte), &m)
+}
+
 
 type Role struct {
 	BaseModel
@@ -26,7 +45,7 @@ type Role struct {
 }
 
 type UserRole struct {
-	BaseModel
+	Id        int `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
 	UserCode   string `gorm:"column:user_code;type:varchar(64)" json:"userCode" form:"userCode" binding:"required"`
 	RoleCode   string `gorm:"column:role_code;type:varchar(64)" json:"roleCode" form:"roleCode" binding:"required"`
 }

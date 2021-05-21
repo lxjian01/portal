@@ -1,35 +1,84 @@
 package sysmgr
 
 import (
-	"errors"
 	"portal/global/gorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
 )
 
 func AddUser(m *models.User) (int, error) {
-	err := gorm.GetOrmDB().Table("user").Create(m).Error
+	// 开始事务
+	tx := gorm.GetOrmDB().Begin()
+	// add user role
+	var userRoleList []models.UserRole
+	for _, item := range m.Roles{
+		var userRole models.UserRole
+		userCode := m.UserCode
+		roleCode := item
+		userRole.UserCode = userCode
+		userRole.RoleCode = roleCode
+		userRoleList = append(userRoleList, userRole)
+	}
+	if len(userRoleList) > 0 {
+		err := tx.Table("user_role").Create(&userRoleList).Error
+		if err != nil {
+			tx.Rollback()
+			return 0, err
+		}
+	}
+	err := tx.Table("user").Create(m).Error
 	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	// 提交事务
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
 		return 0, err
 	}
 	return m.Id, nil
 }
 
 func UpdateUser(m *models.User) error {
-	result := gorm.GetOrmDB().Table("user").Select("user_name","phone","email","weixin","update_user").Where("id = ?", m.Id).Updates(m)
+	// 开始事务
+	tx := gorm.GetOrmDB().Begin()
+	// delete user role
+	result := tx.Table("user_role").Where("user_code = ?", m.UserCode).Delete(&models.Role{})
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
-	if result.RowsAffected == 0 {
-		return errors.New("更新失败")
+	// add user role
+	var userRoleList []models.UserRole
+	for _, item := range m.Roles{
+		var userRole models.UserRole
+		userCode := m.UserCode
+		roleCode := item
+		userRole.UserCode = userCode
+		userRole.RoleCode = roleCode
+		userRoleList = append(userRoleList, userRole)
 	}
-	return nil
+	if len(userRoleList) > 0 {
+		err := tx.Table("user_role").Create(&userRoleList).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	// update user
+	result = tx.Table("user").Select("user_name","phone","email","weixin","update_user").Where("id = ?", m.Id).Updates(m)
+	if result.Error != nil {
+		tx.Rollback()
+		return result.Error
+	}
+	// 提交事务
+	return tx.Commit().Error
 }
 
 func DeleteUser(id int) error {
 	// 开始事务
 	tx := gorm.GetOrmDB().Begin()
-	defer tx.Rollback()
 	// find user
 	txUser := tx.Table("user").Where("id = ?", id)
 	var user models.User
@@ -37,11 +86,13 @@ func DeleteUser(id int) error {
 	// delete user role
 	result := tx.Table("user_role").Where("user_code = ?", user.UserCode).Delete(&models.Role{})
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 	// delete user
 	result = txUser.Delete(&models.User{})
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 	// 提交事务

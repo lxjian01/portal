@@ -1,7 +1,6 @@
 package sysmgr
 
 import (
-	"errors"
 	"portal/global/gorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
@@ -17,19 +16,12 @@ func AddRole(m *models.Role) (int, error) {
 
 func UpdateRole(m *models.Role) error {
 	result := gorm.GetOrmDB().Table("role").Select("role_name").Where("id = ?", m.Id).Updates(m)
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return errors.New("更新失败")
-	}
-	return nil
+	return result.Error
 }
 
 func DeleteRole(id int) error {
 	// 开始事务
 	tx := gorm.GetOrmDB().Begin()
-	defer tx.Rollback()
 	// find role
 	txRole := tx.Table("role").Where("id = ?", id)
 	var role models.Role
@@ -37,11 +29,13 @@ func DeleteRole(id int) error {
 	// delete user role
 	result := tx.Table("user_role").Where("role_code = ?", role.RoleCode).Delete(&models.Role{})
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 	// delete role
 	result = txRole.Delete(&models.Role{})
 	if result.Error != nil {
+		tx.Rollback()
 		return result.Error
 	}
 	// 提交事务
@@ -56,7 +50,7 @@ func GetRoleDetail(id int) (*models.Role, error) {
 
 func GetRoleList() (*[]models.Role, error) {
 	dataList := make([]models.Role, 0)
-	gorm.GetOrmDB().Table("role").Select("id","role_name").Find(&dataList)
+	gorm.GetOrmDB().Table("role").Select("id","role_code","role_name").Find(&dataList)
 	return &dataList, nil
 }
 
