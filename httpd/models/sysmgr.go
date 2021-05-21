@@ -22,8 +22,10 @@ type User struct {
 	Phone   string `gorm:"column:phone;type:varchar(32)" json:"phone" form:"phone" binding:"required"`
 	Email   string `gorm:"column:email;type:varchar(64);not null" json:"email" form:"email" binding:"required,email"`
 	Weixin   string `gorm:"column:weixin;type:varchar(64)" json:"weixin" form:"weixin" binding:""`
-	Roles  []string               `gorm:"-" json:"roles"`
+	Roles  []string          `gorm:"-" json:"roles"`
 }
+
+
 
 type Roles []string
 

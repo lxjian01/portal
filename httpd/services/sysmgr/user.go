@@ -82,6 +82,14 @@ func DeleteUser(id int) error {
 func GetUserDetail(id int) (*models.User, error) {
 	var m models.User
 	myorm.GetOrmDB().Table("user").Where("id = ?", id).First(&m)
+	var roles []role
+	myorm.GetOrmDB().Table("user_role").Select("user_role.role_code","user_role.user_code", "role.role_name").Joins("left join role on user_role.role_code = role.role_code").Find(&roles)
+	for _, pitem := range roles {
+		if m.UserCode == pitem.UserCode {
+			value := pitem
+			m.Roles = append(m.Roles, value.RoleCode)
+		}
+	}
 	return &m, nil
 }
 
@@ -90,6 +98,13 @@ func GetUserList() (*[]models.User, error) {
 	myorm.GetOrmDB().Table("user").Select("id","user_name","phone","email","weixin").Find(&dataList)
 	return &dataList, nil
 }
+
+type role struct {
+	UserCode  string
+	RoleCode string
+	RoleName string
+}
+
 
 func GetUserPage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.User, 0)
@@ -102,6 +117,17 @@ func GetUserPage(pageIndex int, pageSize int, keywords string) (*utils.PageData,
 	if err != nil {
 		return nil, err
 	}
+	var roles []role
+	myorm.GetOrmDB().Table("user_role").Select("user_role.role_code","user_role.user_code", "role.role_name").Joins("left join role on user_role.role_code = role.role_code").Find(&roles)
+	for index, item := range dataList {
+		for _, pitem := range roles {
+			if item.UserCode == pitem.UserCode {
+				value := pitem
+				dataList[index].Roles = append(dataList[index].Roles, value.RoleName)
+			}
+		}
+	}
+
 	pageData.Data = &dataList
 	return pageData, nil
 }

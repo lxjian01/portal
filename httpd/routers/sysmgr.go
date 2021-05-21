@@ -15,7 +15,7 @@ func SysmgrRoutes(route *gin.Engine) {
 		user.GET("/menu/list", sysmgr.GetMenuList)
 		user.GET("/menu/parent_list", sysmgr.GetParentMenuList)
 		user.GET("/menu/page", sysmgr.GetMenuPage)
-		user.GET("/menu/detail/:id", sysmgr.GetMenuDetail)
+		user.GET("/menu/:id", sysmgr.GetMenuDetail)
 
 		// user
 		user.POST("/user", sysmgr.AddUser)
@@ -23,7 +23,7 @@ func SysmgrRoutes(route *gin.Engine) {
 		user.DELETE("/user/:id", sysmgr.DeleteUser)
 		user.GET("/user/list", sysmgr.GetUserList)
 		user.GET("/user/page", sysmgr.GetUserPage)
-		user.GET("/user/detail/:id", sysmgr.GetUserDetail)
+		user.GET("/user/:id", sysmgr.GetUserDetail)
 
 		// role
 		user.POST("/role", sysmgr.AddRole)
@@ -31,6 +31,6 @@ func SysmgrRoutes(route *gin.Engine) {
 		user.DELETE("/role/:id", sysmgr.DeleteRole)
 		user.GET("/role/list", sysmgr.GetRoleList)
 		user.GET("/role/page", sysmgr.GetRolePage)
-		user.GET("/role/detail/:id", sysmgr.GetRoleDetail)
+		user.GET("/role/:id", sysmgr.GetRoleDetail)
 	}
 }
