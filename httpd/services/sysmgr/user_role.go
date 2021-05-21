@@ -45,7 +45,7 @@ func GetUserRolePage(pageIndex int, pageSize int, keywords string) (*utils.PageD
 	tx := gorm.GetOrmDB().Table("user_role")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("user_code like ? or user_code like ?", likeStr)
+		tx.Where("user_code like ? or role_code like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

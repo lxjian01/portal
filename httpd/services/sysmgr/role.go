@@ -16,7 +16,7 @@ func AddRole(m *models.Role) (int, error) {
 }
 
 func UpdateRole(m *models.Role) error {
-	result := gorm.GetOrmDB().Table("role").Select("id","role_name").Where("id = ?", m.Id).Updates(m)
+	result := gorm.GetOrmDB().Table("role").Select("role_name").Where("id = ?", m.Id).Updates(m)
 	if result.Error != nil {
 		return result.Error
 	}

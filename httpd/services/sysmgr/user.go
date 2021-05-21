@@ -16,7 +16,7 @@ func AddUser(m *models.User) (int, error) {
 }
 
 func UpdateUser(m *models.User) error {
-	result := gorm.GetOrmDB().Table("user").Select("id","user_code","user_name","phone","email","weixin","update_user","update_time").Where("id = ?", m.Id).Updates(m)
+	result := gorm.GetOrmDB().Table("user").Select("user_name","phone","email","weixin","update_user").Where("id = ?", m.Id).Updates(m)
 	if result.Error != nil {
 		return result.Error
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func AddMenu(m *models.Menu) (int, error) {
-	err := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","create_user","create_time","update_user","update_time").Create(m).Error
+	err := gorm.GetOrmDB().Table("menu").Create(m).Error
 	if err != nil {
 		return 0, err
 	}
@@ -16,7 +16,7 @@ func AddMenu(m *models.Menu) (int, error) {
 }
 
 func UpdateMenu(m *models.Menu) error {
-	result := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","update_user","update_time").Where("id = ?", m.Id).Updates(m)
+	result := gorm.GetOrmDB().Table("menu").Select("pid","title","path","icon","sort","update_user").Where("id = ?", m.Id).Updates(m)
 	if result.Error != nil {
 		return result.Error
 	}
