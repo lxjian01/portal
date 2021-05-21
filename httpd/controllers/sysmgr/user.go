@@ -54,7 +54,7 @@ func DeleteUser(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = sysmgr.DeleteUser(id)
+	err = sysmgr.DeleteUser(id)
 	if err != nil {
 		log.Errorf("Delete system user id=%d error %s", id, err.Error())
 		resp.ToError(c, err)

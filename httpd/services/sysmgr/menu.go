@@ -42,7 +42,7 @@ func GetMenuDetail(id int) (*models.Menu, error) {
 
 func GetMenuList() (*[]models.Menu, error) {
 	dataList := make([]models.Menu, 0)
-	gorm.GetOrmDB().Table("menu").Select("id","pid","title","path","icon","sort").Find(&dataList)
+	gorm.GetOrmDB().Table("menu").Select("id","pid","title","path","icon","sort").Order("pid desc,update_time asc,sort asc").Find(&dataList)
 	return &dataList, nil
 }
 

@@ -26,12 +26,26 @@ func UpdateRole(m *models.Role) error {
 	return nil
 }
 
-func DeleteRole(id int) (int64, error) {
-	result := gorm.GetOrmDB().Table("role").Where("id = ?", id).Delete(&models.Role{})
+func DeleteRole(id int) error {
+	// 开始事务
+	tx := gorm.GetOrmDB().Begin()
+	defer tx.Rollback()
+	// find role
+	txRole := tx.Table("role").Where("id = ?", id)
+	var role models.Role
+	txRole.First(&role)
+	// delete user role
+	result := tx.Table("user_role").Where("role_code = ?", role.RoleCode).Delete(&models.Role{})
 	if result.Error != nil {
-		return 0, result.Error
+		return result.Error
 	}
-	return result.RowsAffected, nil
+	// delete role
+	result = txRole.Delete(&models.Role{})
+	if result.Error != nil {
+		return result.Error
+	}
+	// 提交事务
+	return tx.Commit().Error
 }
 
 func GetRoleDetail(id int) (*models.Role, error) {
