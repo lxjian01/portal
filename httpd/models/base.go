@@ -7,11 +7,11 @@ import (
 )
 
 type BaseModel struct {
-	Id        int `myorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
-	CreateUser string `myorm:"column:create_user;type:varchar(64);default='system'" json:"createUser"`
-	CreateTime MyTime `myorm:"column:create_time;type:datetime;autoCreateTime" json:"createTime"`
-	UpdateUser string `myorm:"column:update_user;type:varchar(64);default='system'" json:"updateUser"`
-	UpdateTime MyTime `myorm:"column:update_time;type:datetime;autoUpdateTime" json:"updateTime"`
+	Id        int `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
+	CreateUser string `gorm:"column:create_user;type:varchar(64);default='system'" json:"createUser"`
+	CreateTime MyTime `gorm:"column:create_time;type:datetime;autoCreateTime" json:"createTime"`
+	UpdateUser string `gorm:"column:update_user;type:varchar(64);default='system'" json:"updateUser"`
+	UpdateTime MyTime `gorm:"column:update_time;type:datetime;autoUpdateTime" json:"updateTime"`
 }
 
 const myTimeFormat string = "2006-01-02 15:04:05"

@@ -1,6 +1,7 @@
 package sysmgr
 
 import (
+	"gorm.io/gorm"
 	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
@@ -20,26 +21,21 @@ func UpdateRole(m *models.Role) error {
 }
 
 func DeleteRole(id int) error {
-	// 开始事务
-	tx := myorm.GetOrmDB().Begin()
-	// find role
-	txRole := tx.Table("role").Where("id = ?", id)
-	var role models.Role
-	txRole.First(&role)
-	// delete user role
-	result := tx.Table("user_role").Where("role_code = ?", role.RoleCode).Delete(&models.Role{})
-	if result.Error != nil {
-		tx.Rollback()
+	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find role
+		txRole := tx.Table("role").Where("id = ?", id)
+		var role models.Role
+		txRole.First(&role)
+		// delete user role
+		result := tx.Table("user_role").Where("role_code = ?", role.RoleCode).Delete(&models.Role{})
+		if result.Error != nil {
+			return result.Error
+		}
+		// delete role
+		result = txRole.Delete(&models.Role{})
 		return result.Error
-	}
-	// delete role
-	result = txRole.Delete(&models.Role{})
-	if result.Error != nil {
-		tx.Rollback()
-		return result.Error
-	}
-	// 提交事务
-	return tx.Commit().Error
+	})
+	return err
 }
 
 func GetRoleDetail(id int) (*models.Role, error) {
