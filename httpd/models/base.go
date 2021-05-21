@@ -48,7 +48,3 @@ func (mt *MyTime) UnmarshalJSON(b []byte) error {
 	*mt = MyTime{Time: now}
 	return err
 }
-
-func (mt MyTime) Now() MyTime {
-	return MyTime{Time: time.Now()}
-}

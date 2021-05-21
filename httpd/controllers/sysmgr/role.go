@@ -19,9 +19,6 @@ func AddRole(c *gin.Context){
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	var myTime models.MyTime
-	m.CreateTime = myTime.Now()
-	m.UpdateTime = myTime.Now()
 	_, err := sysmgr.AddRole(&m)
 	if err != nil {
 		log.Errorf("Add system role error %s",err.Error())
@@ -40,8 +37,6 @@ func UpdateRole(c *gin.Context){
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	var myTime models.MyTime
-	m.UpdateTime = myTime.Now()
 	err := sysmgr.UpdateRole(&m)
 	if err != nil {
 		log.Errorf("Update system role id=%d error %s", m.Id, err.Error())
