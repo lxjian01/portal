@@ -26,7 +26,7 @@ func DeleteRole(id int) error {
 		txRole := tx.Table("role").Where("id = ?", id)
 		var role models.Role
 		txRole.First(&role)
-		// delete user role
+		// delete role user
 		result := tx.Table("user_role").Where("role_code = ?", role.RoleCode).Delete(&models.Role{})
 		if result.Error != nil {
 			return result.Error

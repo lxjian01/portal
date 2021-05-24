@@ -1,6 +1,7 @@
 package alarm
 
 import (
+	"gorm.io/gorm"
 	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
@@ -20,6 +21,23 @@ func UpdateAlarmGroup(m *models.AlarmGroup) error {
 }
 
 func DeleteAlarmGroup(id int) error {
+	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find alarm group
+		txAlarmGroup := tx.Table("alarm_group").Where("id = ?", id)
+		var alarmGroup models.AlarmGroup
+		txAlarmGroup.First(&alarmGroup)
+		// delete alarm group user
+		result := tx.Table("alarm_group_user").Where("alarm_group_id = ?", alarmGroup.Id).Delete(&models.AlarmGroup{})
+		if result.Error != nil {
+			return result.Error
+		}
+		// delete alarm group
+		result = txAlarmGroup.Delete(&models.AlarmGroup{})
+		return result.Error
+	})
+	return err
+
+
 	result := myorm.GetOrmDB().Table("alarm_group").Where("id = ?", id).Delete(&models.AlarmGroup{})
 	return result.Error
 }

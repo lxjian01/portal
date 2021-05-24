@@ -12,3 +12,10 @@ type AlarmUser struct {
 	Email   string `gorm:"column:email;type:varchar(64);not null" json:"email" form:"email" binding:"required,email"`
 	Weixin   string `gorm:"column:weixin;type:varchar(64)" json:"weixin" form:"weixin" binding:""`
 }
+
+type AlarmGroupUser struct {
+	Id        int `gorm:"primary_key;AUTO_INCREMENT;column:id" json:"id" form:"id" binding:""`
+	AlarmGroupId   string `gorm:"column:alarm_group_id;type:varchar(64)" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
+	UserCode   string `gorm:"column:user_code;type:varchar(64)" json:"userCode" form:"userCode" binding:"required"`
+
+}
