@@ -2,7 +2,7 @@ package models
 
 type AlarmGroup struct {
 	BaseModel
-	AlarmGroupName   string `gorm:"column:alarm_group;type:varchar(64);not null" json:"alarmGroupName" form:"alarmGroupName" binding:"required"`
+	AlarmGroupName   string `gorm:"column:alarm_group_name;type:varchar(64);not null" json:"alarmGroupName" form:"alarmGroupName" binding:"required"`
 }
 
 type AlarmUser struct {
