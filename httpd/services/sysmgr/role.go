@@ -44,12 +44,12 @@ func GetRoleList() (*[]models.Role, error) {
 	return &dataList, nil
 }
 
-func GetRolePage(pageIndex int, pageSize int, roleName string) (*utils.PageData, error) {
+func GetRolePage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.Role, 0)
 	tx := myorm.GetOrmDB().Table("role")
-	if roleName != "" {
-		likeStr := "%" + roleName + "%"
-		tx.Where("role_name like ?", likeStr)
+	if keywords != "" {
+		likeStr := "%" + keywords + "%"
+		tx.Where("role_code like ? or role_name like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
