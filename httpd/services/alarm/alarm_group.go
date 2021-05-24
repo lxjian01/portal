@@ -16,7 +16,7 @@ func AddAlarmGroup(m *models.AlarmGroup) (int, error) {
 }
 
 func UpdateAlarmGroup(m *models.AlarmGroup) error {
-	result := myorm.GetOrmDB().Table("alarm_group").Select("alarm_group_name").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("alarm_group").Select("group_name").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -36,24 +36,14 @@ func DeleteAlarmGroup(id int) error {
 		return result.Error
 	})
 	return err
-
-
-	result := myorm.GetOrmDB().Table("alarm_group").Where("id = ?", id).Delete(&models.AlarmGroup{})
-	return result.Error
 }
 
-func GetAlarmGroupList() (*[]models.AlarmGroup, error) {
-	dataList := make([]models.AlarmGroup, 0)
-	myorm.GetOrmDB().Table("alarm_group").Select("id","alarm_group_name").Find(&dataList)
-	return &dataList, nil
-}
-
-func GetAlarmGroupPage(pageIndex int, pageSize int, alarmGroupName string) (*utils.PageData, error) {
+func GetAlarmGroupPage(pageIndex int, pageSize int, groupName string) (*utils.PageData, error) {
 	dataList := make([]models.AlarmGroup, 0)
 	tx := myorm.GetOrmDB().Table("alarm_group")
-	if alarmGroupName != "" {
-		likeStr := "%" + alarmGroupName + "%"
-		tx.Where("alarm_group_name like ?", likeStr)
+	if groupName != "" {
+		likeStr := "%" + groupName + "%"
+		tx.Where("group_name like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

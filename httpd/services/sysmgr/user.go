@@ -93,12 +93,6 @@ func GetUserDetail(id int) (*models.User, error) {
 	return &m, nil
 }
 
-func GetUserList() (*[]models.User, error) {
-	dataList := make([]models.User, 0)
-	myorm.GetOrmDB().Table("user").Select("id","user_name").Find(&dataList)
-	return &dataList, nil
-}
-
 type role struct {
 	UserCode  string
 	RoleCode string

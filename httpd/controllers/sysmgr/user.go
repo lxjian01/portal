@@ -81,17 +81,6 @@ func GetUserDetail(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetUserList(c *gin.Context){
-	resp := &utils.Response{}
-	data, err := sysmgr.GetUserList()
-	if err != nil {
-		resp.ToMsgBadRequest(c, err.Error())
-		return
-	}
-	resp.Data = data
-	resp.ToSuccess(c)
-}
-
 func GetUserPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
