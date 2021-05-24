@@ -55,7 +55,7 @@ func UpdateUser(m *models.User) error {
 			}
 		}
 		// update user
-		result = tx.Table("user").Select("user_name","phone","email","weixin","update_user").Where("id = ?", m.Id).Updates(m)
+		result = tx.Table("user").Select("user_name","update_user").Where("id = ?", m.Id).Updates(m)
 		return result.Error
 	})
 	return err
@@ -95,7 +95,7 @@ func GetUserDetail(id int) (*models.User, error) {
 
 func GetUserList() (*[]models.User, error) {
 	dataList := make([]models.User, 0)
-	myorm.GetOrmDB().Table("user").Select("id","user_name","phone","email","weixin").Find(&dataList)
+	myorm.GetOrmDB().Table("user").Select("id","user_name").Find(&dataList)
 	return &dataList, nil
 }
 
