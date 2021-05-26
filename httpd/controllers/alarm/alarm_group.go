@@ -103,8 +103,8 @@ func GetAlarmGroupPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	title, _ := c.GetQuery("title")
-	data, err := alarm.GetAlarmGroupPage(pageIndex, pageSize, title)
+	keywords, _ := c.GetQuery("keywords")
+	data, err := alarm.GetAlarmGroupPage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

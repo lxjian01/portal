@@ -92,11 +92,11 @@ func GetAlarmGroupDetail(id int) (*models.AlarmGroupAdd, error) {
 	return &m, nil
 }
 
-func GetAlarmGroupPage(pageIndex int, pageSize int, groupName string) (*utils.PageData, error) {
+func GetAlarmGroupPage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.AlarmGroupPage, 0)
 	tx := myorm.GetOrmDB().Table("alarm_group")
-	if groupName != "" {
-		likeStr := "%" + groupName + "%"
+	if keywords != "" {
+		likeStr := "%" + keywords + "%"
 		tx.Where("group_name like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
