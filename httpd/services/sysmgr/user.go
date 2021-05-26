@@ -9,23 +9,23 @@ import (
 
 func AddUser(m *models.User) (int, error) {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
-		// add user role
-		var userRoleList []models.UserRole
-		for _, item := range m.Roles{
-			var userRole models.UserRole
-			userCode := m.UserCode
-			roleCode := item
-			userRole.UserCode = userCode
-			userRole.RoleCode = roleCode
-			userRoleList = append(userRoleList, userRole)
-		}
-		if len(userRoleList) > 0 {
-			err := tx.Table("user_role").Create(&userRoleList).Error
-			if err != nil {
-				return err
-			}
-		}
+		// add user
 		err := tx.Table("user").Create(m).Error
+		if err != nil {
+			return err
+		}
+		// add user role
+		if len(m.Roles) > 0 {
+			var userRoleList []models.UserRole
+			for _, item := range m.Roles{
+				var userRole models.UserRole
+				roleCode := item
+				userRole.UserCode = m.UserCode
+				userRole.RoleCode = roleCode
+				userRoleList = append(userRoleList, userRole)
+			}
+			err = tx.Table("user_role").Create(&userRoleList).Error
+		}
 		return err
 	})
 	return m.Id, err
@@ -34,9 +34,9 @@ func AddUser(m *models.User) (int, error) {
 func UpdateUser(m *models.User) error {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// delete user role
-		result := tx.Table("user_role").Where("user_code = ?", m.UserCode).Delete(&models.Role{})
-		if result.Error != nil {
-			return result.Error
+		err := tx.Table("user_role").Where("user_code = ?", m.UserCode).Delete(&models.Role{}).Error
+		if err != nil {
+			return err
 		}
 		// add user role
 		var userRoleList []models.UserRole
@@ -55,8 +55,8 @@ func UpdateUser(m *models.User) error {
 			}
 		}
 		// update user
-		result = tx.Table("user").Select("user_name","update_user").Where("id = ?", m.Id).Updates(m)
-		return result.Error
+		err = tx.Table("user").Select("user_name","update_user").Where("id = ?", m.Id).Updates(m).Error
+		return err
 	})
 	return err
 }

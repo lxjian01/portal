@@ -38,8 +38,8 @@ func DeleteAlarmUser(id int) error {
 	return err
 }
 
-func GetAlarmUserList() (*[]models.AlarmUser, error) {
-	dataList := make([]models.AlarmUser, 0)
+func GetAlarmUserList() (*[]models.AlarmUserList, error) {
+	dataList := make([]models.AlarmUserList, 0)
 	myorm.GetOrmDB().Table("alarm_user").Select("id","user_name").Find(&dataList)
 	return &dataList, nil
 }

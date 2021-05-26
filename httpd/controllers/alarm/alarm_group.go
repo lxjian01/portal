@@ -12,7 +12,7 @@ import (
 
 func AddAlarmGroup(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmGroup
+	var m models.AlarmGroupAdd
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
@@ -31,7 +31,7 @@ func AddAlarmGroup(c *gin.Context){
 
 func UpdateAlarmGroup(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmGroup
+	var m models.AlarmGroupAdd
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
@@ -60,6 +60,24 @@ func DeleteAlarmGroup(c *gin.Context){
 		resp.ToError(c, err)
 		return
 	}
+	resp.ToSuccess(c)
+}
+
+func GetAlarmGroupDetail(c *gin.Context){
+	resp := &utils.Response{}
+	obj := c.Param("id")
+	id, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数id必须是整数")
+		return
+	}
+	data, err := alarm.GetAlarmGroupDetail(id)
+	if err != nil {
+		log.Errorf("Get alarm group id=%d error %s", id, err.Error())
+		resp.ToError(c, err)
+		return
+	}
+	resp.Data = data
 	resp.ToSuccess(c)
 }
 

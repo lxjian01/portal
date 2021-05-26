@@ -13,6 +13,7 @@ func AlarmRoutes(route *gin.Engine) {
 		user.PUT("/group/:id", alarm.UpdateAlarmGroup)
 		user.DELETE("/group/:id", alarm.DeleteAlarmGroup)
 		user.GET("/group/page", alarm.GetAlarmGroupPage)
+		user.GET("/group/:id", alarm.GetAlarmGroupDetail)
 
 		// alarm user
 		user.POST("/user", alarm.AddAlarmUser)
