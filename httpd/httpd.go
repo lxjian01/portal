@@ -18,6 +18,7 @@ func StartHttpdServer(c *config.HttpdConfig) {
 	// 添加路由
 
 	routers.SysmgrRoutes(router)      //Added system mgr routers
+	routers.MonitorRoutes(router)      //Added monitor routers
 	routers.AlarmRoutes(router)      //Added alarm routers
 	// 拼接host
 	Host := c.Host
