@@ -38,7 +38,7 @@ func GetMenuList() (*[]models.Menu, error) {
 
 func GetParentMenuList() (*[]models.Menu, error) {
 	dataList := make([]models.Menu, 0)
-	myorm.GetOrmDB().Table("menu").Select("id","pid","title").Where("pid = 0").Find(&dataList)
+	myorm.GetOrmDB().Table("menu").Select("id","pid","title").Order("sort asc").Where("pid = 0").Find(&dataList)
 	return &dataList, nil
 }
 

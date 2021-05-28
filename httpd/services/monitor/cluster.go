@@ -15,7 +15,7 @@ func AddMonitorCluster(m *models.MonitorCluster) (int, error) {
 }
 
 func UpdateMonitorCluster(m *models.MonitorCluster) error {
-	result := myorm.GetOrmDB().Table("monitor_cluster").Select("name","prometheus_url").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","prometheus_url","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -24,8 +24,8 @@ func DeleteMonitorCluster(id int) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
-func GetMonitorClusterList() (*[]models.MonitorCluster, error) {
-	dataList := make([]models.MonitorCluster, 0)
+func GetMonitorClusterList() (*[]models.MonitorClusterList, error) {
+	dataList := make([]models.MonitorClusterList, 0)
 	myorm.GetOrmDB().Table("monitor_cluster").Select("code","name").Find(&dataList)
 	return &dataList, nil
 }
