@@ -10,18 +10,18 @@ import (
 	"strconv"
 )
 
-func AddMonitorCluster(c *gin.Context){
+func AddMonitorTarget(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorCluster
+	var m models.MonitorTarget
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := monitor.AddMonitorCluster(&m)
+	_, err := monitor.AddMonitorTarget(&m)
 	if err != nil {
-		log.Errorf("Add monitor cluster error %s",err.Error())
+		log.Errorf("Add monitor target error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddMonitorCluster(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMonitorCluster(c *gin.Context){
+func UpdateMonitorTarget(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorCluster
+	var m models.MonitorTarget
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := monitor.UpdateMonitorCluster(&m)
+	err := monitor.UpdateMonitorTarget(&m)
 	if err != nil {
-		log.Errorf("Update monitor cluster id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update monitor target id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteMonitorCluster(c *gin.Context){
+func DeleteMonitorTarget(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,27 +54,16 @@ func DeleteMonitorCluster(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = monitor.DeleteMonitorCluster(id)
+	_, err = monitor.DeleteMonitorTarget(id)
 	if err != nil {
-		log.Errorf("Delete monitor cluster id=%d error %s", id, err.Error())
+		log.Errorf("Delete monitor target id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetMonitorClusterList(c *gin.Context){
-	resp := &utils.Response{}
-	data, err := monitor.GetMonitorClusterList()
-	if err != nil {
-		resp.ToMsgBadRequest(c, err.Error())
-		return
-	}
-	resp.Data = data
-	resp.ToSuccess(c)
-}
-
-func GetMonitorClusterPage(c *gin.Context){
+func GetMonitorTargetPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -97,7 +86,7 @@ func GetMonitorClusterPage(c *gin.Context){
 		return
 	}
 	keywords, _ := c.GetQuery("keywords")
-	data, err := monitor.GetMonitorClusterPage(pageIndex, pageSize, keywords)
+	data, err := monitor.GetMonitorTargetPage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

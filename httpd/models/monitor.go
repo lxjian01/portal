@@ -35,6 +35,6 @@ type MonitorTarget struct {
 	AlarmGroupId   int `gorm:"column:alarm_group_id;type:int" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Interval   int `gorm:"column:interval;type:int" json:"interval" form:"interval" binding:"required"`
-	Url   string `gorm:"column:Url;type:varchar(512)" json:"Url" form:"Url" binding:""`
+	Url   string `gorm:"column:Url;type:varchar(128)" json:"Url" form:"Url" binding:""`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }

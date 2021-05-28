@@ -21,7 +21,7 @@ func AddMonitorComponent(c *gin.Context){
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	_, err := monitor.AddMonitorComponent(&m)
 	if err != nil {
-		log.Errorf("Add system alarm group error %s",err.Error())
+		log.Errorf("Add monitor component error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -39,7 +39,7 @@ func UpdateMonitorComponent(c *gin.Context){
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	err := monitor.UpdateMonitorComponent(&m)
 	if err != nil {
-		log.Errorf("Update system alarm group id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update monitor component id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -56,7 +56,7 @@ func DeleteMonitorComponent(c *gin.Context){
 	}
 	_, err = monitor.DeleteMonitorComponent(id)
 	if err != nil {
-		log.Errorf("Delete system alarm group id=%d error %s", id, err.Error())
+		log.Errorf("Delete monitor component id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
