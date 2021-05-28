@@ -2,7 +2,7 @@ package models
 
 type AlarmGroup struct {
 	BaseModel
-	GroupName   string `gorm:"column:group_name;type:varchar(64);not null" json:"groupName" form:"groupName" binding:"required"`
+	GroupName   string `gorm:"column:group_name;type:varchar(64)" json:"groupName" form:"groupName" binding:"required"`
 }
 
 type AlarmGroupAdd struct {
@@ -17,9 +17,9 @@ type AlarmGroupPage struct {
 
 type AlarmUser struct {
 	BaseModel
-	UserName   string `gorm:"column:user_name;type:varchar(64);not null" json:"userName" form:"userName" binding:"required"`
+	UserName   string `gorm:"column:user_name;type:varchar(64)" json:"userName" form:"userName" binding:"required"`
 	Phone   string `gorm:"column:phone;type:varchar(32)" json:"phone" form:"phone" binding:""`
-	Email   string `gorm:"column:email;type:varchar(64);not null" json:"email" form:"email" binding:"required,email"`
+	Email   string `gorm:"column:email;type:varchar(64)" json:"email" form:"email" binding:"required,email"`
 	Weixin   string `gorm:"column:weixin;type:varchar(64)" json:"weixin" form:"weixin" binding:""`
 }
 
