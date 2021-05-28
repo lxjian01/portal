@@ -96,7 +96,7 @@ func GetMonitorComponentPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	keywords, _ := c.GetQuery("keywords")
+	keywords := c.GetString("keywords")
 	data, err := monitor.GetMonitorComponentPage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())

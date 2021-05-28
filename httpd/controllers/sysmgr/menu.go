@@ -125,7 +125,7 @@ func GetMenuPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	title, _ := c.GetQuery("title")
+	title := c.GetString("title")
 	data, err := sysmgr.GetMenuPage(pageIndex, pageSize, title)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
