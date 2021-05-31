@@ -2,12 +2,17 @@ package models
 
 type AlarmGroup struct {
 	BaseModel
-	GroupName   string `gorm:"column:group_name;type:varchar(64)" json:"groupName" form:"groupName" binding:"required"`
+	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 }
 
 type AlarmGroupAdd struct {
 	AlarmGroup
 	Users  []int         `gorm:"-" json:"users"`
+}
+
+type AlarmGroupList struct {
+	Id int `gorm:"column:id" json:"id"`
+	Name   string `gorm:"column:name" json:"name"`
 }
 
 type AlarmGroupPage struct {

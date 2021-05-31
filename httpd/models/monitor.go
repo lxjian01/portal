@@ -9,9 +9,8 @@ type MonitorCluster struct {
 }
 
 type MonitorClusterList struct {
-	BaseModel
-	Code   string `json:"code"`
-	Name   string `json:"name"`
+	Id int `gorm:"column:id" json:"id"`
+	Name   string `gorm:"column:name" json:"name"`
 }
 
 type MonitorComponent struct {
@@ -24,9 +23,8 @@ type MonitorComponent struct {
 }
 
 type MonitorComponentList struct {
-	BaseModel
-	Code   string `gorm:"column:code" json:"code" form:"code" binding:"required"`
-	Name   string `json:"name"`
+	Id int `gorm:"column:id" json:"id"`
+	Name   string `gorm:"column:name" json:"name"`
 }
 
 type MonitorTarget struct {
@@ -47,12 +45,6 @@ type MonitorTargetPage struct {
 	MonitorComponentName   string `gorm:"column:monitor_component_name" json:"monitorComponentName"`
 	Exporter   string `gorm:"column:exporter" json:"exporter"`
 	GroupList []interface{} `json:"alarmGroupList"`
-}
-
-type AlarmGroupList struct {
-	AlarmGroupId int `gorm:"column:alarm_group_id" json:"alarmGroupId"`
-	AlarmGroupName string `gorm:"column:alarm_group_name" json:"alarmGroupName"`
-	MonitorTargetId int `gorm:"column:monitor_target_id" json:"monitorTargetId"`
 }
 
 type MonitorTargetAlarmGroup struct {

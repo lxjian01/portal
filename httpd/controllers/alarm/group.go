@@ -81,6 +81,17 @@ func GetAlarmGroupDetail(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
+func GetAlarmGroupList(c *gin.Context){
+	resp := &utils.Response{}
+	data, err := alarm.GetAlarmGroupList()
+	if err != nil {
+		resp.ToMsgBadRequest(c, err.Error())
+		return
+	}
+	resp.Data = data
+	resp.ToSuccess(c)
+}
+
 func GetAlarmGroupPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")

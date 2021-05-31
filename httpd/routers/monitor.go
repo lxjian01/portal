@@ -12,15 +12,15 @@ func MonitorRoutes(route *gin.Engine) {
 		user.POST("/cluster", monitor.AddMonitorCluster)
 		user.PUT("/cluster/:id", monitor.UpdateMonitorCluster)
 		user.DELETE("/cluster/:id", monitor.DeleteMonitorCluster)
-		user.GET("/cluster/page", monitor.GetMonitorClusterPage)
 		user.GET("/cluster/list", monitor.GetMonitorClusterList)
+		user.GET("/cluster/page", monitor.GetMonitorClusterPage)
 
 		// monitor component
 		user.POST("/component", monitor.AddMonitorComponent)
 		user.PUT("/component/:id", monitor.UpdateMonitorComponent)
 		user.DELETE("/component/:id", monitor.DeleteMonitorComponent)
-		user.GET("/component/page", monitor.GetMonitorComponentPage)
 		user.GET("/component/list", monitor.GetMonitorComponentList)
+		user.GET("/component/page", monitor.GetMonitorComponentPage)
 
 		// monitor target
 		user.POST("/target", monitor.AddMonitorTarget)

@@ -26,7 +26,7 @@ func DeleteMonitorCluster(id int) (int64, error) {
 
 func GetMonitorClusterList() (*[]models.MonitorClusterList, error) {
 	dataList := make([]models.MonitorClusterList, 0)
-	myorm.GetOrmDB().Table("monitor_cluster").Select("code","name").Find(&dataList)
+	myorm.GetOrmDB().Table("monitor_cluster").Select("id","name").Find(&dataList)
 	return &dataList, nil
 }
 

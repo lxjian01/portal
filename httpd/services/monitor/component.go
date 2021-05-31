@@ -26,7 +26,7 @@ func DeleteMonitorComponent(id int) (int64, error) {
 
 func GetMonitorComponentList() (*[]models.MonitorComponentList, error) {
 	dataList := make([]models.MonitorComponentList, 0)
-	myorm.GetOrmDB().Table("monitor_component").Select("code","name").Find(&dataList)
+	myorm.GetOrmDB().Table("monitor_component").Select("id","name").Find(&dataList)
 	return &dataList, nil
 }
 
