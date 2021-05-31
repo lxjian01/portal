@@ -29,23 +29,6 @@ func AddMonitorTarget(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMonitorTarget(c *gin.Context){
-	var resp utils.Response
-	var m models.MonitorTarget
-	if err := c.ShouldBindJSON(&m);err != nil{
-		resp.ToError(c, err)
-		return
-	}
-	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := monitor.UpdateMonitorTarget(&m)
-	if err != nil {
-		log.Errorf("Update monitor target id=%d error %s", m.Id, err.Error())
-		resp.ToError(c, err)
-		return
-	}
-	resp.ToSuccess(c)
-}
-
 func DeleteMonitorTarget(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
@@ -54,7 +37,7 @@ func DeleteMonitorTarget(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = monitor.DeleteMonitorTarget(id)
+	err = monitor.DeleteMonitorTarget(id)
 	if err != nil {
 		log.Errorf("Delete monitor target id=%d error %s", id, err.Error())
 		resp.ToError(c, err)

@@ -15,5 +15,11 @@ mysql:
   db: "portal"
   user: "root"
   password: "123456"
+consul:
+  host: "127.0.0.1"
+  port: 8500
+prometheus:
+  host: "127.0.0.1"
+  port: 9090
 
 

@@ -27,4 +27,6 @@ func GetPageData(tx *gorm.DB, pageIndex int, pageSize int,data interface{}) (*Pa
 	pageData.Data = data
 	pageData.Total = total
 	return pageData, nil
+
+
 }

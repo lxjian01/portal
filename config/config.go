@@ -6,6 +6,7 @@ type AppConfig struct {
 	Httpd      *HttpdConfig   `yaml:"httpd"`
 	Log        *LogConfig     `yaml:"log"`
 	Mysql      *MysqlConfig   `yaml:"mysql"`
+	Consul *ConsulConfig   `yaml:"consul"`
 }
 
 type HttpdConfig struct {
@@ -28,4 +29,9 @@ type MysqlConfig struct {
 	User        string
 	Password    string
 	Charset     string
+}
+
+type ConsulConfig struct {
+	Host        string
+	Port        int
 }

@@ -24,7 +24,6 @@ func MonitorRoutes(route *gin.Engine) {
 
 		// monitor target
 		user.POST("/target", monitor.AddMonitorTarget)
-		user.PUT("/target/:id", monitor.UpdateMonitorTarget)
 		user.DELETE("/target/:id", monitor.DeleteMonitorTarget)
 		user.GET("/target/page", monitor.GetMonitorTargetPage)
 	}
