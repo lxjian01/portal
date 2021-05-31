@@ -33,7 +33,6 @@ type MonitorTarget struct {
 	BaseModel
 	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
 	MonitorComponentId   int `gorm:"column:monitor_component_id;type:int" json:"monitorComponentId" form:"monitorComponentId" binding:"required"`
-	AlarmGroupId   int `gorm:"column:alarm_group_id;type:int" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Url   string `gorm:"column:url;type:varchar(128)" json:"url" form:"url" binding:""`
 	Interval   string `gorm:"column:interval;type:varchar(32)" json:"interval" form:"interval" binding:"required"`
@@ -47,4 +46,17 @@ type MonitorTargetPage struct {
 	MonitorComponentCode   string `gorm:"column:monitor_component_code" json:"monitorComponentCode"`
 	MonitorComponentName   string `gorm:"column:monitor_component_name" json:"monitorComponentName"`
 	Exporter   string `gorm:"column:exporter" json:"exporter"`
+	GroupList []interface{} `json:"alarmGroupList"`
+}
+
+type AlarmGroupList struct {
+	AlarmGroupId int `gorm:"column:alarm_group_id" json:"alarmGroupId"`
+	AlarmGroupName string `gorm:"column:alarm_group_name" json:"alarmGroupName"`
+	MonitorTargetId int `gorm:"column:monitor_target_id" json:"monitorTargetId"`
+}
+
+type MonitorTargetAlarmGroup struct {
+	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
+	MonitorTargetId   string `gorm:"column:monitor_target_id;type:int" json:"monitorTargetId" form:"monitorTargetId" binding:"required"`
+	AlarmGroupId   string `gorm:"column:alarm_group_id;type:int" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
 }

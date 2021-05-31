@@ -32,5 +32,4 @@ type AlarmGroupUser struct {
 	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
 	UserId   int `gorm:"column:user_id;type:int" json:"userId" form:"userId" binding:"required"`
 	GroupId   int `gorm:"column:group_id;type:int" json:"groupId" form:"groupId" binding:"required"`
-
 }

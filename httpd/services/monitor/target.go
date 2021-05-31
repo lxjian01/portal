@@ -69,17 +69,17 @@ func DeleteMonitorTarget(id int) error {
 	return err
 }
 
-func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, monitorComponentId int, alarmGroupId int, keywords string) (*utils.PageData, error) {
+func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterCode string, monitorComponentCode string, alarmGroupId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorTargetPage, 0)
 	tx := myorm.GetOrmDB().Table("monitor_target")
 	tx.Select("monitor_target.id","monitor_target.monitor_cluster_id","monitor_target.monitor_component_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","monitor_component.code as monitor_component_code","monitor_component.name as monitor_component_name","monitor_component.exporter")
 	tx.Joins("left join monitor_cluster on monitor_cluster.id = monitor_target.monitor_cluster_id")
 	tx.Joins("left join monitor_component on monitor_component.id = monitor_target.monitor_component_id")
-	if monitorClusterId != 0 {
-		tx.Where("monitor_cluster_id = ?", monitorClusterId)
+	if monitorClusterCode != "" {
+		tx.Where("monitor_cluster_code = ?", monitorClusterCode)
 	}
-	if monitorComponentId != 0 {
-		tx.Where("monitor_component_id = ?", monitorComponentId)
+	if monitorComponentCode != "" {
+		tx.Where("monitor_component_code = ?", monitorComponentCode)
 	}
 	if alarmGroupId != 0 {
 		tx.Where("alarm_group_id = ?", alarmGroupId)
@@ -92,6 +92,16 @@ func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, mon
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
 		return nil, err
+	}
+	alarmGroupList := make([]models.AlarmGroupList, 0)
+	myorm.GetOrmDB().Table("alarm_group").Select("monitor_target_alarm_group.alarm_group_id","alarm_group.group_name as alarm_group_name","monitor_target_alarm_group.monitor_target_id").Joins("left join monitor_target_alarm_group on monitor_target_alarm_group.alarm_group_id = alarm_group.id").Find(&alarmGroupList)
+	for index, item := range dataList {
+		for _, group := range alarmGroupList {
+			if item.Id == group.MonitorTargetId {
+				value := group
+				dataList[index].GroupList = append(dataList[index].GroupList, &value)
+			}
+		}
 	}
 
 	pageData.Data = &dataList

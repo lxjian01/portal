@@ -68,11 +68,11 @@ func GetMonitorTargetPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	monitorClusterId := c.GetInt("monitorClusterId")
-	monitorComponentId := c.GetInt("monitorComponentId")
+	monitorClusterCode := c.GetString("monitorClusterCode")
+	monitorComponentCode := c.GetString("monitorComponentCode")
 	alarmGroupId := c.GetInt("alarmGroupId")
 	keywords := c.GetString("keywords")
-	data, err := monitor.GetMonitorTargetPage(pageIndex, pageSize, monitorClusterId, monitorComponentId, alarmGroupId, keywords)
+	data, err := monitor.GetMonitorTargetPage(pageIndex, pageSize, monitorClusterCode, monitorComponentCode, alarmGroupId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
