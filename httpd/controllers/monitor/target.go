@@ -12,7 +12,7 @@ import (
 
 func AddMonitorTarget(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorTarget
+	var m models.MonitorTargetAdd
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return

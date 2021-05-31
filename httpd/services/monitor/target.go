@@ -9,17 +9,17 @@ import (
 	"portal/httpd/utils"
 )
 
-func AddMonitorTarget(m *models.MonitorTarget) (int, error) {
+func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor cluster
 		monitorCluster := models.MonitorCluster{}
-		err := tx.Table("monitor_cluster").Where("monitor_cluster_id = ?", m.MonitorClusterId).Find(&monitorCluster).Error
+		err := tx.Table("monitor_cluster").Where("id = ?", m.MonitorClusterId).Find(&monitorCluster).Error
 		if err != nil {
 			return err
 		}
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
-		err = tx.Table("monitor_component").Where("monitor_component_id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
+		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
 		if err != nil {
 			return err
 		}
@@ -27,6 +27,20 @@ func AddMonitorTarget(m *models.MonitorTarget) (int, error) {
 		err = tx.Table("monitor_target").Create(m).Error
 		if err != nil {
 			return err
+		}
+		// add monitor target alarm group
+		if len(m.AlarmGroupIds) > 0 {
+			var mtag []models.MonitorTargetAlarmGroup
+			for _, item := range m.AlarmGroupIds{
+				var alarmGroupUser models.MonitorTargetAlarmGroup
+				alarmGroupUser.MonitorTargetId = m.Id
+				alarmGroupUser.AlarmGroupId = item
+				mtag = append(mtag, alarmGroupUser)
+			}
+			err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
+			if err != nil {
+				return err
+			}
 		}
 		// registry consul service
 		meta := make(map[string]string, 0)
@@ -52,16 +66,24 @@ func AddMonitorTarget(m *models.MonitorTarget) (int, error) {
 
 func DeleteMonitorTarget(id int) error {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find monitor target
 		monitorTarget := models.MonitorTarget{}
-		txQuery := tx.Table("monitor_cluster").Where("monitor_target_id = ?", id)
+		txQuery := tx.Table("monitor_target").Where("id = ?", id)
 		err := txQuery.Find(&monitorTarget).Error
 		if err != nil {
 			return err
 		}
+		// delete monitor target alarm group
+		err = tx.Table("monitor_target_alarm_group").Where("monitor_target_id = ?", id).Delete(&models.MonitorTargetAlarmGroup{}).Error
+		if err != nil {
+			return err
+		}
+		// delete monitor target
 		err = txQuery.Delete(&models.MonitorTarget{}).Error
 		if err != nil {
 			return err
 		}
+		// delete consul service
 		client := consul.GetClient()
 		err = client.Agent().ServiceDeregister(monitorTarget.Url)
 		return err
@@ -97,7 +119,7 @@ func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, mon
 		return nil, err
 	}
 	alarmGroupList := make([]alarmGroupList, 0)
-	myorm.GetOrmDB().Table("alarm_group").Select("monitor_target_alarm_group.alarm_group_id","alarm_group.group_name as alarm_group_name","monitor_target_alarm_group.monitor_target_id").Joins("left join monitor_target_alarm_group on monitor_target_alarm_group.alarm_group_id = alarm_group.id").Find(&alarmGroupList)
+	myorm.GetOrmDB().Table("alarm_group").Select("monitor_target_alarm_group.alarm_group_id","alarm_group.name as alarm_group_name","monitor_target_alarm_group.monitor_target_id").Joins("left join monitor_target_alarm_group on monitor_target_alarm_group.alarm_group_id = alarm_group.id").Find(&alarmGroupList)
 	for index, item := range dataList {
 		for _, group := range alarmGroupList {
 			if item.Id == group.MonitorTargetId {

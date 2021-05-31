@@ -37,6 +37,11 @@ type MonitorTarget struct {
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
 
+type MonitorTargetAdd struct {
+	MonitorTarget
+	AlarmGroupIds  []int         `gorm:"-" json:"alarmGroupIds" form:"alarmGroupIds" binding:"required"`
+}
+
 type MonitorTargetPage struct {
 	MonitorTarget
 	MonitorClusterCode   string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
@@ -49,6 +54,6 @@ type MonitorTargetPage struct {
 
 type MonitorTargetAlarmGroup struct {
 	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
-	MonitorTargetId   string `gorm:"column:monitor_target_id;type:int" json:"monitorTargetId" form:"monitorTargetId" binding:"required"`
-	AlarmGroupId   string `gorm:"column:alarm_group_id;type:int" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
+	MonitorTargetId   int `gorm:"column:monitor_target_id;type:int" json:"monitorTargetId" form:"monitorTargetId" binding:"required"`
+	AlarmGroupId   int `gorm:"column:alarm_group_id;type:int" json:"alarmGroupId" form:"alarmGroupId" binding:"required"`
 }

@@ -7,7 +7,7 @@ type AlarmGroup struct {
 
 type AlarmGroupAdd struct {
 	AlarmGroup
-	Users  []int         `gorm:"-" json:"users"`
+	Users  []int         `gorm:"-" json:"users" form:"users" binding:""`
 }
 
 type AlarmGroupList struct {

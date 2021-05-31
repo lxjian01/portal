@@ -14,7 +14,7 @@ type User struct {
 	BaseModel
 	UserCode   string `gorm:"column:user_code;type:varchar(64);uniqueIndex" json:"userCode" form:"userCode" binding:"required"`
 	UserName   string `gorm:"column:user_name;type:varchar(64)" json:"userName" form:"userName" binding:"required"`
-	Roles  []string          `gorm:"-" json:"roles"`
+	Roles  []string          `gorm:"-" json:"roles" form:"roles" binding:""`
 }
 
 type Role struct {
