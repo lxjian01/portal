@@ -7,9 +7,12 @@ import (
 	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
+	"strconv"
+	"strings"
 )
 
 func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
+	clusterUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor cluster
 		monitorCluster := models.MonitorCluster{}
@@ -17,6 +20,7 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		if err != nil {
 			return err
 		}
+		clusterUrl = monitorCluster.PrometheusUrl
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
 		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
@@ -48,19 +52,32 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		meta["component"] = monitorComponent.Code
 		meta["exporter"] = monitorComponent.Exporter
 		client := consul.GetClient()
+		ip := strings.Split(m.Url,"/")[2]
+		tempIp := strings.Split(ip,":")
+		address := tempIp[0]
+		port,err := strconv.Atoi(tempIp[1])
+		if err != nil {
+			return err
+		}
 		check := consulapi.AgentServiceCheck{
 			HTTP:     m.Url,
 			Interval: m.Interval,
 		}
+		serviceId := strconv.Itoa(m.Id)
 		registration := consulapi.AgentServiceRegistration{
-			ID:    m.Url,
+			ID:    serviceId,
 			Name:  m.Name,
+			Address: address,
+			Port: port,
 			Meta:  meta,
 			Check: &check,
 		}
 		err = client.Agent().ServiceRegister(&registration)
 		return err
 	})
+
+	// reload prometheus
+	err = utils.PrometheusReload(clusterUrl)
 	return m.Id, err
 }
 
@@ -85,7 +102,8 @@ func DeleteMonitorTarget(id int) error {
 		}
 		// delete consul service
 		client := consul.GetClient()
-		err = client.Agent().ServiceDeregister(monitorTarget.Url)
+		serviceId := strconv.Itoa(monitorTarget.Id)
+		err = client.Agent().ServiceDeregister(serviceId)
 		return err
 	})
 	return err
