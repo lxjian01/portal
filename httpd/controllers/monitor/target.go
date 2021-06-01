@@ -29,6 +29,23 @@ func AddMonitorTarget(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
+func UpdateMonitorTarget(c *gin.Context){
+	var resp utils.Response
+	var m models.MonitorTargetAdd
+	if err := c.ShouldBindJSON(&m);err != nil{
+		resp.ToError(c, err)
+		return
+	}
+	m.UpdateUser = middlewares.GetLoginUser().UserCode
+	_, err := monitor.UpdateMonitorTarget(&m)
+	if err != nil {
+		log.Errorf("Update monitor target id=%d error %s", m.Id, err.Error())
+		resp.ToError(c, err)
+		return
+	}
+	resp.ToSuccess(c)
+}
+
 func DeleteMonitorTarget(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")

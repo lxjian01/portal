@@ -81,7 +81,83 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 	return m.Id, err
 }
 
+func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
+	clusterUrl := ""
+	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find monitor cluster
+		monitorCluster := models.MonitorCluster{}
+		err := tx.Table("monitor_cluster").Where("id = ?", m.MonitorClusterId).Find(&monitorCluster).Error
+		if err != nil {
+			return err
+		}
+		clusterUrl = monitorCluster.PrometheusUrl
+		// find monitor component
+		monitorComponent := models.MonitorComponent{}
+		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
+		if err != nil {
+			return err
+		}
+		// update monitor target
+		err = tx.Table("monitor_target").Where("id = ?", m.Id).Updates(m).Error
+		if err != nil {
+			return err
+		}
+		// delete monitor target alarm group
+		err = tx.Table("monitor_target_alarm_group").Where("monitor_target_id = ?", m.Id).Delete(&models.MonitorTargetAlarmGroup{}).Error
+		if err != nil {
+			return err
+		}
+		// add monitor target alarm group
+		if len(m.AlarmGroupIds) > 0 {
+			var mtag []models.MonitorTargetAlarmGroup
+			for _, item := range m.AlarmGroupIds{
+				var alarmGroupUser models.MonitorTargetAlarmGroup
+				alarmGroupUser.MonitorTargetId = m.Id
+				alarmGroupUser.AlarmGroupId = item
+				mtag = append(mtag, alarmGroupUser)
+			}
+			err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
+			if err != nil {
+				return err
+			}
+		}
+		// registry consul service
+		meta := make(map[string]string, 0)
+		meta["cluster"] = monitorCluster.Code
+		meta["component"] = monitorComponent.Code
+		meta["exporter"] = monitorComponent.Exporter
+		client := consul.GetClient()
+		ip := strings.Split(m.Url,"/")[2]
+		tempIp := strings.Split(ip,":")
+		address := tempIp[0]
+		port,err := strconv.Atoi(tempIp[1])
+		if err != nil {
+			return err
+		}
+		check := consulapi.AgentServiceCheck{
+			HTTP:     m.Url,
+			Interval: m.Interval,
+		}
+		serviceId := strconv.Itoa(m.Id)
+		registration := consulapi.AgentServiceRegistration{
+			ID:    serviceId,
+			Name:  m.Name,
+			Address: address,
+			Port: port,
+			Meta:  meta,
+			Check: &check,
+		}
+		err = client.Agent().ServiceRegister(&registration)
+		return err
+	})
+
+	// reload prometheus
+	err = utils.PrometheusReload(clusterUrl)
+	return m.Id, err
+}
+
 func DeleteMonitorTarget(id int) error {
+	clusterUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor target
 		monitorTarget := models.MonitorTarget{}
@@ -90,6 +166,13 @@ func DeleteMonitorTarget(id int) error {
 		if err != nil {
 			return err
 		}
+		// find monitor cluster
+		monitorCluster := models.MonitorCluster{}
+		err = tx.Table("monitor_cluster").Where("id = ?", monitorTarget.MonitorClusterId).Find(&monitorCluster).Error
+		if err != nil {
+			return err
+		}
+		clusterUrl = monitorCluster.PrometheusUrl
 		// delete monitor target alarm group
 		err = tx.Table("monitor_target_alarm_group").Where("monitor_target_id = ?", id).Delete(&models.MonitorTargetAlarmGroup{}).Error
 		if err != nil {
@@ -106,6 +189,8 @@ func DeleteMonitorTarget(id int) error {
 		err = client.Agent().ServiceDeregister(serviceId)
 		return err
 	})
+	// reload prometheus
+	err = utils.PrometheusReload(clusterUrl)
 	return err
 }
 
