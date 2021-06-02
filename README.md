@@ -6,13 +6,13 @@
 2. 资源利用率统计
 
 2、meta
-* cluster: openstack_1 openstack_2 kubernetes_1 kubernetes_2
+* cluster: openstack_1 openstack_2 k8s_1 k8s_2 ceph_1 ceph_2 other
 
-* component: linux_computer openstack_computer centos_vm ubuntu_vm windows_vm
+* type: centos ubuntu windows centos_vm ubuntu_vm windows_vm
 
-* team: bigdata payment dba
+* team: bigdata payment dba openstack k8s
 
-* project: project_1 project_2
+* project: project_1 project_2 nova-control nova-compute k8s-master k8s-node
 
 * app: app_1 app_2
 
