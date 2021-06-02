@@ -5,7 +5,7 @@
 1. 便于grafana过滤区分展示
 2. 资源利用率统计
 
-2、作用
+2、meta
 * cluster: openstack_1 openstack_2 kubernetes_1 kubernetes_2
 
 * component: linux_computer openstack_computer centos_vm ubuntu_vm windows_vm
