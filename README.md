@@ -1,13 +1,22 @@
 # portal
 
-## design
-1、cluster  
-openstack_1 openstack_2 kubernetes_1 kubernetes_2
+## meta标签
+1、作用
+1. 便于grafana过滤区分展示
+2. 资源利用率统计
 
-2、component  
-linux_computer openstack_computer centos_vm ubuntu_vm windows_vm
+2、作用
+* cluster: openstack_1 openstack_2 kubernetes_1 kubernetes_2
 
-3、exporter  
+* component: linux_computer openstack_computer centos_vm ubuntu_vm windows_vm
+
+* team: bigdata payment dba
+
+* project: project_1 project_2
+
+* app: app_1 app_2
+
+## exporter
 * node exporter  
 linux主机监控，提供cpu、内存、磁盘io、网络io、分区等监控数据  
 https://github.com/prometheus/node_exporter
