@@ -13,6 +13,17 @@ type MonitorClusterList struct {
 	Name   string `gorm:"column:name" json:"name"`
 }
 
+type MonitorExporter struct {
+	BaseModel
+	Name   string `gorm:"column:name;type:varchar(64);uniqueIndex" json:"name" form:"name" binding:"required"`
+	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
+}
+
+type MonitorExporterList struct {
+	Id int `gorm:"column:id" json:"id"`
+	Name   string `gorm:"column:name" json:"name"`
+}
+
 type MonitorPrometheus struct {
 	BaseModel
 	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
