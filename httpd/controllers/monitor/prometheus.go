@@ -1,27 +1,27 @@
-package alarm
+package monitor
 
 import (
 	"github.com/gin-gonic/gin"
 	"portal/global/log"
 	"portal/httpd/middlewares"
 	"portal/httpd/models"
-	"portal/httpd/services/alarm"
+	"portal/httpd/services/monitor"
 	"portal/httpd/utils"
 	"strconv"
 )
 
-func AddAlarmUser(c *gin.Context){
+func AddMonitorPrometheus(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmUser
+	var m models.MonitorPrometheus
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := alarm.AddAlarmUser(&m)
+	_, err := monitor.AddMonitorPrometheus(&m)
 	if err != nil {
-		log.Errorf("Add system user error %s",err.Error())
+		log.Errorf("Add monitor prometheus error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddAlarmUser(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateAlarmUser(c *gin.Context){
+func UpdateMonitorPrometheus(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmUser
+	var m models.MonitorPrometheus
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := alarm.UpdateAlarmUser(&m)
+	err := monitor.UpdateMonitorPrometheus(&m)
 	if err != nil {
-		log.Errorf("Update system user id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update monitor prometheus id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteAlarmUser(c *gin.Context){
+func DeleteMonitorPrometheus(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,18 +54,18 @@ func DeleteAlarmUser(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	err = alarm.DeleteAlarmUser(id)
+	_, err = monitor.DeleteMonitorPrometheus(id)
 	if err != nil {
-		log.Errorf("Delete system user id=%d error %s", id, err.Error())
+		log.Errorf("Delete monitor prometheus id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetAlarmUserList(c *gin.Context){
+func GetMonitorPrometheusList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := alarm.GetAlarmUserList()
+	data, err := monitor.GetMonitorPrometheusList()
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -74,7 +74,7 @@ func GetAlarmUserList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetAlarmUserPage(c *gin.Context){
+func GetMonitorPrometheusPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -96,8 +96,17 @@ func GetAlarmUserPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	userName := c.Query("userName")
-	data, err := alarm.GetAlarmUserPage(pageIndex, pageSize, userName)
+	monitorClusterId := 0
+	obj, isExist = c.GetQuery("monitorClusterId")
+	if isExist == true {
+		monitorClusterId, err = strconv.Atoi(obj)
+		if err != nil {
+			resp.ToMsgBadRequest(c, "参数monitorClusterId必须是整数")
+			return
+		}
+	}
+	keywords := c.Query("keywords")
+	data, err := monitor.GetMonitorPrometheusPage(pageIndex, pageSize, monitorClusterId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

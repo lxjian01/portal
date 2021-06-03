@@ -25,6 +25,8 @@ func GetPageData(tx *gorm.DB, pageIndex int, pageSize int,data interface{}) (*Pa
 	tx.Limit(pageSize).Offset(offset).Find(data)
 	pageData := &PageData{}
 	pageData.Data = data
+	pageData.PageIndex = pageIndex
+	pageData.PageSize = pageSize
 	pageData.Total = total
 	return pageData, nil
 

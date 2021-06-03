@@ -103,7 +103,7 @@ func GetUserPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	keywords := c.GetString("keywords")
+	keywords := c.Query("keywords")
 	data, err := sysmgr.GetUserPage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
