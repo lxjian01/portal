@@ -65,7 +65,13 @@ func DeleteMonitorPrometheus(c *gin.Context){
 
 func GetMonitorPrometheusList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := monitor.GetMonitorPrometheusList()
+	obj := c.DefaultQuery("monitorClusterId", "0")
+	monitorClusterId, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数monitorClusterId必须是整数")
+		return
+	}
+	data, err := monitor.GetMonitorPrometheusList(monitorClusterId)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -96,14 +102,11 @@ func GetMonitorPrometheusPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	monitorClusterId := 0
-	obj, isExist = c.GetQuery("monitorClusterId")
-	if isExist == true {
-		monitorClusterId, err = strconv.Atoi(obj)
-		if err != nil {
-			resp.ToMsgBadRequest(c, "参数monitorClusterId必须是整数")
-			return
-		}
+	obj = c.DefaultQuery("monitorClusterId", "0")
+	monitorClusterId, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数monitorClusterId必须是整数")
+		return
 	}
 	keywords := c.Query("keywords")
 	data, err := monitor.GetMonitorPrometheusPage(pageIndex, pageSize, monitorClusterId, keywords)

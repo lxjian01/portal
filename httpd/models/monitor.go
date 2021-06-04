@@ -4,7 +4,6 @@ type MonitorCluster struct {
 	BaseModel
 	Code   string `gorm:"column:code;type:varchar(64);uniqueIndex" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
-	PrometheusUrl   string `gorm:"column:prometheus_url;type:varchar(64)" json:"prometheusUrl" form:"prometheusUrl" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
 
@@ -50,6 +49,7 @@ type MonitorComponentList struct {
 type MonitorTarget struct {
 	BaseModel
 	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
+	MonitorPrometheusId   int `gorm:"column:monitor_prometheus_id;type:int" json:"monitorPrometheusId" form:"monitorPrometheusId" binding:"required"`
 	MonitorComponentId   int `gorm:"column:monitor_component_id;type:int" json:"monitorComponentId" form:"monitorComponentId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Url   string `gorm:"column:url;type:varchar(128)" json:"url" form:"url" binding:""`
@@ -66,6 +66,8 @@ type MonitorTargetPage struct {
 	MonitorTarget
 	MonitorClusterCode   string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
 	MonitorClusterName   string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
+	MonitorPrometheusId   int `gorm:"column:monitor_prometheus_id" json:"monitorPrometheusId"`
+	MonitorPrometheusName  string `gorm:"column:monitor_prometheus_name" json:"monitorPrometheusName"`
 	MonitorComponentCode   string `gorm:"column:monitor_component_code" json:"monitorComponentCode"`
 	MonitorComponentName   string `gorm:"column:monitor_component_name" json:"monitorComponentName"`
 	Exporter   string `gorm:"column:exporter" json:"exporter"`

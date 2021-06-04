@@ -24,9 +24,13 @@ func DeleteMonitorPrometheus(id int) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
-func GetMonitorPrometheusList() (*[]models.MonitorPrometheusList, error) {
+func GetMonitorPrometheusList(monitorClusterId int) (*[]models.MonitorPrometheusList, error) {
 	dataList := make([]models.MonitorPrometheusList, 0)
-	myorm.GetOrmDB().Table("monitor_prometheus").Select("id","name").Find(&dataList)
+	tx := myorm.GetOrmDB().Table("monitor_prometheus")
+	if monitorClusterId != 0 {
+		tx.Where("monitor_cluster_id = ?", monitorClusterId)
+	}
+	tx.Select("id","name").Find(&dataList)
 	return &dataList, nil
 }
 
@@ -36,11 +40,11 @@ func GetMonitorPrometheusPage(pageIndex int, pageSize int, monitorClusterId int,
 	tx.Select("monitor_prometheus.id","monitor_prometheus.name","monitor_prometheus.prometheus_url","monitor_prometheus.remark","monitor_prometheus.create_user","monitor_prometheus.create_time","monitor_prometheus.update_user","monitor_prometheus.update_time","monitor_prometheus.monitor_cluster_id","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name")
 	tx.Joins("left join monitor_cluster on monitor_prometheus.monitor_cluster_id = monitor_cluster.id")
 	if monitorClusterId != 0 {
-		tx.Where("monitor_cluster_id = ?", monitorClusterId)
+		tx.Where("monitor_prometheus.monitor_cluster_id = ?", monitorClusterId)
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("name like ? or prometheus_url like ?", likeStr, likeStr)
+		tx.Where("monitor_prometheus.name like ? or monitor_prometheus.prometheus_url like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

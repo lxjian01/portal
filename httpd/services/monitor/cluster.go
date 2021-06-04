@@ -15,7 +15,7 @@ func AddMonitorCluster(m *models.MonitorCluster) (int, error) {
 }
 
 func UpdateMonitorCluster(m *models.MonitorCluster) error {
-	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","prometheus_url","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -35,7 +35,7 @@ func GetMonitorClusterPage(pageIndex int, pageSize int, keywords string) (*utils
 	tx := myorm.GetOrmDB().Table("monitor_cluster")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("code like ? or name like ? or prometheus_url like ?", likeStr, likeStr, likeStr)
+		tx.Where("code like ? or name like ?", likeStr, likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

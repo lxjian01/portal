@@ -20,7 +20,13 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorCluster.PrometheusUrl
+		// find monitor prometheus
+		monitorPrometheus := models.MonitorPrometheus{}
+		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorCluster).Error
+		if err != nil {
+			return err
+		}
+		clusterUrl = monitorPrometheus.PrometheusUrl
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
 		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
@@ -90,7 +96,13 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorCluster.PrometheusUrl
+		// find monitor prometheus
+		monitorPrometheus := models.MonitorPrometheus{}
+		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorCluster).Error
+		if err != nil {
+			return err
+		}
+		clusterUrl = monitorPrometheus.PrometheusUrl
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
 		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
@@ -172,7 +184,13 @@ func DeleteMonitorTarget(id int) error {
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorCluster.PrometheusUrl
+		// find monitor prometheus
+		monitorPrometheus := models.MonitorPrometheus{}
+		err = tx.Table("monitor_prometheus").Where("id = ?", monitorTarget.MonitorPrometheusId).Find(&monitorCluster).Error
+		if err != nil {
+			return err
+		}
+		clusterUrl = monitorPrometheus.PrometheusUrl
 		// delete monitor target alarm group
 		err = tx.Table("monitor_target_alarm_group").Where("monitor_target_id = ?", id).Delete(&models.MonitorTargetAlarmGroup{}).Error
 		if err != nil {
@@ -200,21 +218,25 @@ type alarmGroupList struct {
 	MonitorTargetId int `gorm:"column:monitor_target_id" json:"monitorTargetId"`
 }
 
-func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, monitorComponentId int, keywords string) (*utils.PageData, error) {
+func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, monitorPrometheusId int, monitorComponentId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorTargetPage, 0)
 	tx := myorm.GetOrmDB().Table("monitor_target")
-	tx.Select("monitor_target.id","monitor_target.monitor_cluster_id","monitor_target.monitor_component_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","monitor_component.code as monitor_component_code","monitor_component.name as monitor_component_name","monitor_component.exporter")
+	tx.Select("monitor_target.id","monitor_target.monitor_cluster_id","monitor_target.monitor_prometheus_id","monitor_target.monitor_component_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","monitor_prometheus.name as monitor_prometheus_name","monitor_component.code as monitor_component_code","monitor_component.name as monitor_component_name","monitor_component.exporter")
 	tx.Joins("left join monitor_cluster on monitor_cluster.id = monitor_target.monitor_cluster_id")
+	tx.Joins("left join monitor_prometheus on monitor_prometheus.id = monitor_target.monitor_prometheus_id")
 	tx.Joins("left join monitor_component on monitor_component.id = monitor_target.monitor_component_id")
 	if monitorClusterId != 0 {
-		tx.Where("monitor_cluster_id = ?", monitorClusterId)
+		tx.Where("monitor_target.monitor_cluster_id = ?", monitorClusterId)
+	}
+	if monitorPrometheusId != 0 {
+		tx.Where("monitor_target.monitor_prometheus_id = ?", monitorPrometheusId)
 	}
 	if monitorComponentId != 0 {
-		tx.Where("monitor_component_id = ?", monitorComponentId)
+		tx.Where("monitor_target.monitor_component_id = ?", monitorComponentId)
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("name like ? or url like ?", likeStr, likeStr)
+		tx.Where("monitor_target.name like ? or monitor_target.url like ?", likeStr, likeStr)
 	}
 
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
