@@ -22,13 +22,6 @@ func MonitorRoutes(route *gin.Engine) {
 		user.GET("/prometheus/list", monitor.GetMonitorPrometheusList)
 		user.GET("/prometheus/page", monitor.GetMonitorPrometheusPage)
 
-		// monitor exporter
-		user.POST("/exporter", monitor.AddMonitorExporter)
-		user.PUT("/exporter/:id", monitor.UpdateMonitorExporter)
-		user.DELETE("/exporter/:id", monitor.DeleteMonitorExporter)
-		user.GET("/exporter/list", monitor.GetMonitorExporterList)
-		user.GET("/exporter/page", monitor.GetMonitorExporterPage)
-
 		// monitor component
 		user.POST("/component", monitor.AddMonitorComponent)
 		user.PUT("/component/:id", monitor.UpdateMonitorComponent)

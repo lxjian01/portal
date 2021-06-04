@@ -2,15 +2,15 @@
 
 ## meta标签
 1、作用
-1. 便于grafana过滤区分展示
-2. 资源利用率统计
+2. 便于grafana过滤区分展示
+3. 资源利用率统计
 
 2、meta
 * cluster: openstack_1 openstack_2 k8s_1 k8s_2 ceph_1 ceph_2 other
 
-* type: centos ubuntu windows centos_vm ubuntu_vm windows_vm
+* resource: centos ubuntu windows centos_vm ubuntu_vm windows_vm
 
-* team: bigdata payment dba openstack k8s
+* team: bigdata payment dba openstack k8sl
 
 * project: project_1 project_2 nova-control nova-compute k8s-master k8s-node
 

@@ -49,7 +49,7 @@ func GetRolePage(pageIndex int, pageSize int, keywords string) (*utils.PageData,
 	tx := myorm.GetOrmDB().Table("role")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("role_code like ? or role_name like ?", likeStr)
+		tx.Where("role_code like ? or role_name like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

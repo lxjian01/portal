@@ -40,7 +40,7 @@ func GetMonitorPrometheusPage(pageIndex int, pageSize int, monitorClusterId int,
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("name like ? or prometheus_url like ?", likeStr)
+		tx.Where("name like ? or prometheus_url like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

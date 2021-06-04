@@ -15,7 +15,7 @@ func AddMonitorComponent(m *models.MonitorComponent) (int, error) {
 }
 
 func UpdateMonitorComponent(m *models.MonitorComponent) error {
-	result := myorm.GetOrmDB().Table("monitor_component").Select("code","name","exporter","template","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_component").Select("code","name","exporter","github_url","template","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -35,7 +35,7 @@ func GetMonitorComponentPage(pageIndex int, pageSize int, keywords string) (*uti
 	tx := myorm.GetOrmDB().Table("monitor_component")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("code like ? or name like ? or exporter like ?", likeStr)
+		tx.Where("code like ? or name like ? or exporter like ?", likeStr, likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

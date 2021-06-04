@@ -13,17 +13,6 @@ type MonitorClusterList struct {
 	Name   string `gorm:"column:name" json:"name"`
 }
 
-type MonitorExporter struct {
-	BaseModel
-	Name   string `gorm:"column:name;type:varchar(64);uniqueIndex" json:"name" form:"name" binding:"required"`
-	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
-}
-
-type MonitorExporterList struct {
-	Id int `gorm:"column:id" json:"id"`
-	Name   string `gorm:"column:name" json:"name"`
-}
-
 type MonitorPrometheus struct {
 	BaseModel
 	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
@@ -48,6 +37,7 @@ type MonitorComponent struct {
 	Code   string `gorm:"column:code;type:varchar(64)" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
+	GithubUrl   string `gorm:"column:github_url;type:varchar(64)" json:"githubUrl" form:"githubUrl" binding:"required"`
 	Template   string `gorm:"column:template;type:varchar(512)" json:"template" form:"template" binding:""`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }

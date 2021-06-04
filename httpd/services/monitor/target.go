@@ -214,7 +214,7 @@ func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, mon
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("name like ? or url like ?", likeStr)
+		tx.Where("name like ? or url like ?", likeStr, likeStr)
 	}
 
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)

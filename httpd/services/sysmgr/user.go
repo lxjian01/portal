@@ -105,7 +105,7 @@ func GetUserPage(pageIndex int, pageSize int, keywords string) (*utils.PageData,
 	tx := myorm.GetOrmDB().Table("user")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("user_code like ? or user_name like ?", likeStr)
+		tx.Where("user_code like ? or user_name like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
