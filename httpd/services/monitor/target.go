@@ -12,7 +12,7 @@ import (
 )
 
 func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
-	clusterUrl := ""
+	prometheusUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor cluster
 		monitorCluster := models.MonitorCluster{}
@@ -22,11 +22,11 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// find monitor prometheus
 		monitorPrometheus := models.MonitorPrometheus{}
-		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorCluster).Error
+		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorPrometheus).Error
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorPrometheus.PrometheusUrl
+		prometheusUrl = monitorPrometheus.PrometheusUrl
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
 		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
@@ -83,12 +83,12 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 	})
 
 	// reload prometheus
-	err = utils.PrometheusReload(clusterUrl)
+	err = utils.PrometheusReload(prometheusUrl)
 	return m.Id, err
 }
 
 func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
-	clusterUrl := ""
+	prometheusUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor cluster
 		monitorCluster := models.MonitorCluster{}
@@ -98,11 +98,11 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// find monitor prometheus
 		monitorPrometheus := models.MonitorPrometheus{}
-		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorCluster).Error
+		err = tx.Table("monitor_prometheus").Where("id = ?", m.MonitorPrometheusId).Find(&monitorPrometheus).Error
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorPrometheus.PrometheusUrl
+		prometheusUrl = monitorPrometheus.PrometheusUrl
 		// find monitor component
 		monitorComponent := models.MonitorComponent{}
 		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
@@ -164,12 +164,12 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 	})
 
 	// reload prometheus
-	err = utils.PrometheusReload(clusterUrl)
+	err = utils.PrometheusReload(prometheusUrl)
 	return m.Id, err
 }
 
 func DeleteMonitorTarget(id int) error {
-	clusterUrl := ""
+	prometheusUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// find monitor target
 		monitorTarget := models.MonitorTarget{}
@@ -186,11 +186,11 @@ func DeleteMonitorTarget(id int) error {
 		}
 		// find monitor prometheus
 		monitorPrometheus := models.MonitorPrometheus{}
-		err = tx.Table("monitor_prometheus").Where("id = ?", monitorTarget.MonitorPrometheusId).Find(&monitorCluster).Error
+		err = tx.Table("monitor_prometheus").Where("id = ?", monitorTarget.MonitorPrometheusId).Find(&monitorPrometheus).Error
 		if err != nil {
 			return err
 		}
-		clusterUrl = monitorPrometheus.PrometheusUrl
+		prometheusUrl = monitorPrometheus.PrometheusUrl
 		// delete monitor target alarm group
 		err = tx.Table("monitor_target_alarm_group").Where("monitor_target_id = ?", id).Delete(&models.MonitorTargetAlarmGroup{}).Error
 		if err != nil {
@@ -208,7 +208,7 @@ func DeleteMonitorTarget(id int) error {
 		return err
 	})
 	// reload prometheus
-	err = utils.PrometheusReload(clusterUrl)
+	err = utils.PrometheusReload(prometheusUrl)
 	return err
 }
 
