@@ -21,6 +21,7 @@
 curl -X POST http://192.168.219.128:9090/-/reload
 
 ## consul
+### consul service
 1、service list  
 curl http://127.0.0.1:8500/v1/agent/services
 
@@ -31,4 +32,8 @@ curl -X PUT -d '{"id": "node-exporter-192.168.219.159","name": "node-exporter-19
 
 3、delete service  
 curl --request PUT http://127.0.0.1:8500/v1/agent/service/deregister/node-exporter
+
+### consul kv
+1、get key
+curl --header "X-Consul-Token: 111111111111" http://127.0.0.1:8500/v1/kv/prometheus/portal/alertings?recurse=true
 
