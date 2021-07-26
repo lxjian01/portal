@@ -8,7 +8,7 @@
 2、meta
 * cluster: openstack_1 openstack_2 k8s_1 k8s_2 ceph_1 ceph_2 other
 
-* componentl: centos ubuntu windows centos_vm ubuntu_vm windows_vm
+* resource: centos ubuntu windows centos_vm ubuntu_vm windows_vm
 
 * team: bigdata payment dba openstack k8sl
 

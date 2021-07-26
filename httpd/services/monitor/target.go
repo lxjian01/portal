@@ -27,9 +27,9 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		prometheusUrl = monitorPrometheus.PrometheusUrl
-		// find monitor component
-		monitorComponent := models.MonitorComponent{}
-		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
+		// find monitor resource
+		monitorResource := models.MonitorResource{}
+		err = tx.Table("monitor_resource").Where("id = ?", m.MonitorResourceId).Find(&monitorResource).Error
 		if err != nil {
 			return err
 		}
@@ -55,8 +55,8 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		// registry consul service
 		meta := make(map[string]string, 0)
 		meta["cluster"] = monitorCluster.Code
-		meta["component"] = monitorComponent.Code
-		meta["exporter"] = monitorComponent.Exporter
+		meta["resource"] = monitorResource.Code
+		meta["exporter"] = monitorResource.Exporter
 		client := consul.GetClient()
 		ip := strings.Split(m.Url,"/")[2]
 		tempIp := strings.Split(ip,":")
@@ -103,9 +103,9 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		prometheusUrl = monitorPrometheus.PrometheusUrl
-		// find monitor component
-		monitorComponent := models.MonitorComponent{}
-		err = tx.Table("monitor_component").Where("id = ?", m.MonitorComponentId).Find(&monitorComponent).Error
+		// find monitor resource
+		monitorResource := models.MonitorResource{}
+		err = tx.Table("monitor_resource").Where("id = ?", m.MonitorResourceId).Find(&monitorResource).Error
 		if err != nil {
 			return err
 		}
@@ -136,8 +136,8 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		// registry consul service
 		meta := make(map[string]string, 0)
 		meta["cluster"] = monitorCluster.Code
-		meta["component"] = monitorComponent.Code
-		meta["exporter"] = monitorComponent.Exporter
+		meta["resource"] = monitorResource.Code
+		meta["exporter"] = monitorResource.Exporter
 		client := consul.GetClient()
 		ip := strings.Split(m.Url,"/")[2]
 		tempIp := strings.Split(ip,":")
@@ -218,21 +218,21 @@ type alarmGroupList struct {
 	MonitorTargetId int `gorm:"column:monitor_target_id" json:"monitorTargetId"`
 }
 
-func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, monitorPrometheusId int, monitorComponentId int, keywords string) (*utils.PageData, error) {
+func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, monitorPrometheusId int, monitorResourceId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorTargetPage, 0)
 	tx := myorm.GetOrmDB().Table("monitor_target")
-	tx.Select("monitor_target.id","monitor_target.monitor_cluster_id","monitor_target.monitor_prometheus_id","monitor_target.monitor_component_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","monitor_prometheus.name as monitor_prometheus_name","monitor_component.code as monitor_component_code","monitor_component.name as monitor_component_name","monitor_component.exporter")
+	tx.Select("monitor_target.id","monitor_target.monitor_cluster_id","monitor_target.monitor_prometheus_id","monitor_target.monitor_resource_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","monitor_prometheus.name as monitor_prometheus_name","monitor_resource.code as monitor_resource_code","monitor_resource.name as monitor_resource_name","monitor_resource.exporter")
 	tx.Joins("left join monitor_cluster on monitor_cluster.id = monitor_target.monitor_cluster_id")
 	tx.Joins("left join monitor_prometheus on monitor_prometheus.id = monitor_target.monitor_prometheus_id")
-	tx.Joins("left join monitor_component on monitor_component.id = monitor_target.monitor_component_id")
+	tx.Joins("left join monitor_resource on monitor_resource.id = monitor_target.monitor_resource_id")
 	if monitorClusterId != 0 {
 		tx.Where("monitor_target.monitor_cluster_id = ?", monitorClusterId)
 	}
 	if monitorPrometheusId != 0 {
 		tx.Where("monitor_target.monitor_prometheus_id = ?", monitorPrometheusId)
 	}
-	if monitorComponentId != 0 {
-		tx.Where("monitor_target.monitor_component_id = ?", monitorComponentId)
+	if monitorResourceId != 0 {
+		tx.Where("monitor_target.monitor_resource_id = ?", monitorResourceId)
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"

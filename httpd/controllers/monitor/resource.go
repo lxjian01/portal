@@ -10,18 +10,18 @@ import (
 	"strconv"
 )
 
-func AddMonitorComponent(c *gin.Context){
+func AddMonitorResource(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorComponent
+	var m models.MonitorResource
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := monitor.AddMonitorComponent(&m)
+	_, err := monitor.AddMonitorResource(&m)
 	if err != nil {
-		log.Errorf("Add monitor component error %s",err.Error())
+		log.Errorf("Add monitor resource error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddMonitorComponent(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMonitorComponent(c *gin.Context){
+func UpdateMonitorResource(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorComponent
+	var m models.MonitorResource
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := monitor.UpdateMonitorComponent(&m)
+	err := monitor.UpdateMonitorResource(&m)
 	if err != nil {
-		log.Errorf("Update monitor component id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update monitor resource id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteMonitorComponent(c *gin.Context){
+func DeleteMonitorResource(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,18 +54,18 @@ func DeleteMonitorComponent(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = monitor.DeleteMonitorComponent(id)
+	_, err = monitor.DeleteMonitorResource(id)
 	if err != nil {
-		log.Errorf("Delete monitor component id=%d error %s", id, err.Error())
+		log.Errorf("Delete monitor resource id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetMonitorComponentList(c *gin.Context){
+func GetMonitorResourceList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := monitor.GetMonitorComponentList()
+	data, err := monitor.GetMonitorResourceList()
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -74,7 +74,7 @@ func GetMonitorComponentList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetMonitorComponentPage(c *gin.Context){
+func GetMonitorResourcePage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -97,7 +97,7 @@ func GetMonitorComponentPage(c *gin.Context){
 		return
 	}
 	keywords := c.Query("keywords")
-	data, err := monitor.GetMonitorComponentPage(pageIndex, pageSize, keywords)
+	data, err := monitor.GetMonitorResourcePage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
