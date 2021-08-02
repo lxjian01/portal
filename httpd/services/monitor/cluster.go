@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"errors"
 	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
@@ -15,11 +16,21 @@ func AddMonitorCluster(m *models.MonitorCluster) (int, error) {
 }
 
 func UpdateMonitorCluster(m *models.MonitorCluster) error {
-	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","prometheus_url","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
 func DeleteMonitorCluster(id int) (int64, error) {
+	// prometheus exists
+	var prometheusCount int64
+	err := myorm.GetOrmDB().Table("prometheus").Where("monitor_cluster_id = ?", id).Count(&prometheusCount).Error
+	if err != nil {
+		return 0, err
+	}
+	if prometheusCount > 0 {
+		return 0, errors.New("集群下存在prometheus，不允许删除")
+	}
+	// delete monitor cluster
 	result := myorm.GetOrmDB().Table("monitor_cluster").Where("id = ?", id).Delete(&models.MonitorCluster{})
 	return result.RowsAffected, result.Error
 }

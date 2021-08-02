@@ -4,7 +4,6 @@ type MonitorCluster struct {
 	BaseModel
 	Code   string `gorm:"column:code;type:varchar(64);uniqueIndex" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
-	PrometheusUrl   string `gorm:"column:prometheus_url;type:varchar(128);uniqueIndex" json:"prometheusUrl" form:"prometheusUrl" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
 
@@ -12,6 +11,20 @@ type MonitorClusterList struct {
 	Id int `gorm:"column:id" json:"id"`
 	Name   string `gorm:"column:name" json:"name"`
 }
+
+type Prometheus struct {
+	BaseModel
+	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
+	Url   string `gorm:"column:url;type:varchar(128);uniqueIndex" json:"url" form:"url" binding:"required"`
+	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
+	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
+}
+
+type PrometheusList struct {
+	Id int `gorm:"column:id" json:"id"`
+	Name   string `gorm:"column:name" json:"name"`
+}
+
 
 type MonitorResource struct {
 	BaseModel
@@ -30,7 +43,7 @@ type MonitorResourceList struct {
 
 type MonitorTarget struct {
 	BaseModel
-	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
+	PrometheusId   int `gorm:"column:prometheus_id;type:int" json:"prometheusId" form:"prometheusId" binding:"required"`
 	MonitorResourceId   int `gorm:"column:monitor_resource_id;type:int" json:"monitorResourceId" form:"monitorResourceId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Url   string `gorm:"column:url;type:varchar(128)" json:"url" form:"url" binding:""`
