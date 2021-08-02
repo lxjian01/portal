@@ -39,10 +39,11 @@ type AlarmGroupUser struct {
 	GroupId   int `gorm:"column:group_id;type:int" json:"groupId" form:"groupId" binding:"required"`
 }
 
-type Recording struct {
+type RecordingRule struct {
 	BaseModel
+	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
-	Record   string `gorm:"column:record;type:varchar(64)" json:"record" form:"record" binding:"required"`
+	Record   string `gorm:"column:record;type:varchar(64);uniqueIndex" json:"record" form:"record" binding:"required"`
 	Expr   string `gorm:"column:expr;type:varchar(64)" json:"expr" form:"expr" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(64)" json:"remark" form:"remark" binding:"required"`
 }
