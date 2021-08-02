@@ -15,7 +15,7 @@ func AddMonitorCluster(m *models.MonitorCluster) (int, error) {
 }
 
 func UpdateMonitorCluster(m *models.MonitorCluster) error {
-	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_cluster").Select("code","name","prometheus_url","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 

@@ -15,13 +15,6 @@ func MonitorRoutes(route *gin.Engine) {
 		user.GET("/cluster/list", monitor.GetMonitorClusterList)
 		user.GET("/cluster/page", monitor.GetMonitorClusterPage)
 
-		// monitor prometheus
-		user.POST("/prometheus", monitor.AddMonitorPrometheus)
-		user.PUT("/prometheus/:id", monitor.UpdateMonitorPrometheus)
-		user.DELETE("/prometheus/:id", monitor.DeleteMonitorPrometheus)
-		user.GET("/prometheus/list", monitor.GetMonitorPrometheusList)
-		user.GET("/prometheus/page", monitor.GetMonitorPrometheusPage)
-
 		// monitor resource
 		user.POST("/resource", monitor.AddMonitorResource)
 		user.PUT("/resource/:id", monitor.UpdateMonitorResource)

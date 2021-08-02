@@ -91,12 +91,6 @@ func GetMonitorTargetPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数monitorClusterId必须是整数")
 		return
 	}
-	obj = c.DefaultQuery("monitorPrometheusId", "0")
-	monitorPrometheusId, err := strconv.Atoi(obj)
-	if err != nil {
-		resp.ToMsgBadRequest(c, "参数monitorPrometheusId必须是整数")
-		return
-	}
 	obj = c.DefaultQuery("monitorResourceId", "0")
 	monitorResourceId, err := strconv.Atoi(obj)
 	if err != nil {
@@ -104,7 +98,7 @@ func GetMonitorTargetPage(c *gin.Context){
 		return
 	}
 	keywords := c.Query("keywords")
-	data, err := monitor.GetMonitorTargetPage(pageIndex, pageSize, monitorClusterId, monitorPrometheusId, monitorResourceId, keywords)
+	data, err := monitor.GetMonitorTargetPage(pageIndex, pageSize, monitorClusterId, monitorResourceId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
