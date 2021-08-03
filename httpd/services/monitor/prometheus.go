@@ -30,6 +30,24 @@ func DeletePrometheus(id int) (int64, error) {
 	if monitorTargetCount > 0 {
 		return 0, errors.New("集群下存在监控目标，不允许删除")
 	}
+	// recording rule exists
+	var recordingRuleCount int64
+	err = myorm.GetOrmDB().Table("recording_rule").Where("prometheus_id = ?", id).Count(&recordingRuleCount).Error
+	if err != nil {
+		return 0, err
+	}
+	if recordingRuleCount > 0 {
+		return 0, errors.New("集群下存在recording rule，不允许删除")
+	}
+	// alerting rule exists
+	var alertingRuleCount int64
+	err = myorm.GetOrmDB().Table("alerting_rule").Where("prometheus_id = ?", id).Count(&alertingRuleCount).Error
+	if err != nil {
+		return 0, err
+	}
+	if alertingRuleCount > 0 {
+		return 0, errors.New("集群下存在alerting rule，不允许删除")
+	}
 	// delete prometheus
 	result := myorm.GetOrmDB().Table("prometheus").Where("id = ?", id).Delete(&models.Prometheus{})
 	return result.RowsAffected, result.Error

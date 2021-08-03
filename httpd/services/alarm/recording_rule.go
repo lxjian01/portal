@@ -14,6 +14,6 @@ func AddRecordingRule(m *models.RecordingRule) (int, error) {
 }
 
 func UpdateRecordingRule(m *models.RecordingRule) error {
-	result := myorm.GetOrmDB().Table("recording_rule").Select("monitor_cluster_id").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("recording_rule").Select("prometheus_id","name","record","expr","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }

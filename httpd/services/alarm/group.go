@@ -1,6 +1,7 @@
 package alarm
 
 import (
+	"errors"
 	"gorm.io/gorm"
 	"portal/global/myorm"
 	"portal/httpd/models"
@@ -59,6 +60,15 @@ func UpdateAlarmGroup(m *models.AlarmGroupAdd) error {
 
 func DeleteAlarmGroup(id int) error {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// monitor target alert group exists
+		var monitorTargetAlertGroupCount int64
+		err := myorm.GetOrmDB().Table("monitor_target_alert_group").Where("alert_group_id = ?", id).Count(&monitorTargetAlertGroupCount).Error
+		if err != nil {
+			return err
+		}
+		if monitorTargetAlertGroupCount > 0 {
+			return errors.New("告警组下存在监控指标，不允许删除")
+		}
 		// delete alarm group user
 		result := tx.Table("alarm_group_user").Where("alarm_group_id = ?", id).Delete(&models.AlarmGroup{})
 		if result.Error != nil {
