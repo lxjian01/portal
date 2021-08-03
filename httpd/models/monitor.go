@@ -63,6 +63,7 @@ type MonitorTargetAdd struct {
 
 type MonitorTargetPage struct {
 	MonitorTarget
+	MonitorClusterId   int `gorm:"column:monitor_cluster_id" json:"monitorClusterId"`
 	MonitorClusterCode   string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
 	MonitorClusterName   string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
 	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
