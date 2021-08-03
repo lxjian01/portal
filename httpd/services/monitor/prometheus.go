@@ -47,9 +47,9 @@ func GetPrometheusList(monitorClusterId int) (*[]models.PrometheusList, error) {
 }
 
 func GetPrometheusPage(pageIndex int, pageSize int, monitorClusterId int, keywords string) (*utils.PageData, error) {
-	dataList := make([]models.Prometheus, 0)
+	dataList := make([]models.PrometheusPage, 0)
 	tx := myorm.GetOrmDB().Table("prometheus")
-	tx.Select("prometheus.id","prometheus.name","prometheus.url","prometheus.remark","prometheus.update_user","prometheus.update_time","prometheus.monitor_cluster_id","monitor_cluster.name as monitor_cluster_name")
+	tx.Select("prometheus.id","prometheus.name","prometheus.url","prometheus.remark","prometheus.update_user","prometheus.update_time","prometheus.monitor_cluster_id","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name")
 	tx.Joins("left join monitor_cluster on monitor_cluster.id = prometheus.monitor_cluster_id")
 	if monitorClusterId != 0 {
 		tx.Where("prometheus.monitor_cluster_id = ?", monitorClusterId)

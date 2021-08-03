@@ -25,6 +25,11 @@ type PrometheusList struct {
 	Name   string `gorm:"column:name" json:"name"`
 }
 
+type PrometheusPage struct {
+	Prometheus
+	MonitorClusterCode string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
+	MonitorClusterName string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
+}
 
 type MonitorResource struct {
 	BaseModel
