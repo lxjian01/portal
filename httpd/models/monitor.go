@@ -60,6 +60,8 @@ type MonitorTargetPage struct {
 	MonitorTarget
 	MonitorClusterCode   string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
 	MonitorClusterName   string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
+	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
+	PrometheusUrl   string `gorm:"column:prometheus_url" json:"prometheusUrl"`
 	MonitorResourceCode   string `gorm:"column:monitor_resource_code" json:"monitorResourceCode"`
 	MonitorResourceName   string `gorm:"column:monitor_resource_name" json:"monitorResourceName"`
 	Exporter   string `gorm:"column:exporter" json:"exporter"`
