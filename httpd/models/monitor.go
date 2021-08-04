@@ -1,34 +1,16 @@
 package models
 
-type MonitorCluster struct {
-	BaseModel
-	Code   string `gorm:"column:code;type:varchar(64);uniqueIndex" json:"code" form:"code" binding:"required"`
-	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
-	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
-}
-
-type MonitorClusterList struct {
-	Id int `gorm:"column:id" json:"id"`
-	Name   string `gorm:"column:name" json:"name"`
-}
-
 type Prometheus struct {
 	BaseModel
-	MonitorClusterId   int `gorm:"column:monitor_cluster_id;type:int" json:"monitorClusterId" form:"monitorClusterId" binding:"required"`
-	Url   string `gorm:"column:url;type:varchar(128);uniqueIndex" json:"url" form:"url" binding:"required"`
+	Code   string `gorm:"column:code;type:varchar(64)" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
+	Url   string `gorm:"column:url;type:varchar(128);uniqueIndex" json:"url" form:"url" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
 
 type PrometheusList struct {
 	Id int `gorm:"column:id" json:"id"`
 	Name   string `gorm:"column:name" json:"name"`
-}
-
-type PrometheusPage struct {
-	Prometheus
-	MonitorClusterCode string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
-	MonitorClusterName string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
 }
 
 type MonitorResource struct {
@@ -63,9 +45,7 @@ type MonitorTargetAdd struct {
 
 type MonitorTargetPage struct {
 	MonitorTarget
-	MonitorClusterId   int `gorm:"column:monitor_cluster_id" json:"monitorClusterId"`
-	MonitorClusterCode   string `gorm:"column:monitor_cluster_code" json:"monitorClusterCode"`
-	MonitorClusterName   string `gorm:"column:monitor_cluster_name" json:"monitorClusterName"`
+	PrometheusCode   string `gorm:"column:prometheus_code" json:"prometheusCode"`
 	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
 	PrometheusUrl   string `gorm:"column:prometheus_url" json:"prometheusUrl"`
 	MonitorResourceCode   string `gorm:"column:monitor_resource_code" json:"monitorResourceCode"`

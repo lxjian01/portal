@@ -8,13 +8,6 @@ import (
 func MonitorRoutes(route *gin.Engine) {
 	user := route.Group("/api/portal/monitor")
 	{
-		// monitor cluster
-		user.POST("/cluster", monitor.AddMonitorCluster)
-		user.PUT("/cluster/:id", monitor.UpdateMonitorCluster)
-		user.DELETE("/cluster/:id", monitor.DeleteMonitorCluster)
-		user.GET("/cluster/list", monitor.GetMonitorClusterList)
-		user.GET("/cluster/page", monitor.GetMonitorClusterPage)
-
 		// prometheus
 		user.POST("/prometheus", monitor.AddPrometheus)
 		user.PUT("/prometheus/:id", monitor.UpdatePrometheus)

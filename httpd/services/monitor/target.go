@@ -21,12 +21,6 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		prometheusUrl = prometheus.Url
-		// find monitor cluster
-		monitorCluster := models.MonitorCluster{}
-		err = tx.Table("monitor_cluster").Where("id = ?", prometheus.MonitorClusterId).Find(&monitorCluster).Error
-		if err != nil {
-			return err
-		}
 		// find monitor resource
 		monitorResource := models.MonitorResource{}
 		err = tx.Table("monitor_resource").Where("id = ?", m.MonitorResourceId).Find(&monitorResource).Error
@@ -54,7 +48,7 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// registry consul service
 		tags := make([]string, 0)
-		tags = append(tags, monitorCluster.Code)
+		tags = append(tags, prometheus.Code)
 		tags = append(tags, monitorResource.Exporter)
 		meta := make(map[string]string, 0)
 		meta["resource"] = monitorResource.Code
@@ -99,12 +93,6 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		prometheusUrl = prometheus.Url
-		// find monitor cluster
-		monitorCluster := models.MonitorCluster{}
-		err = tx.Table("monitor_cluster").Where("id = ?", prometheus.MonitorClusterId).Find(&monitorCluster).Error
-		if err != nil {
-			return err
-		}
 		// find monitor resource
 		monitorResource := models.MonitorResource{}
 		err = tx.Table("monitor_resource").Where("id = ?", m.MonitorResourceId).Find(&monitorResource).Error
@@ -137,7 +125,7 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// registry consul service
 		tags := make([]string, 0)
-		tags = append(tags, monitorCluster.Code)
+		tags = append(tags, prometheus.Code)
 		tags = append(tags, monitorResource.Exporter)
 		meta := make(map[string]string, 0)
 		meta["resource"] = monitorResource.Code
@@ -216,16 +204,12 @@ type alarmGroupList struct {
 	MonitorTargetId int `gorm:"column:monitor_target_id" json:"monitorTargetId"`
 }
 
-func GetMonitorTargetPage(pageIndex int, pageSize int, monitorClusterId int, prometheusId int, monitorResourceId int, keywords string) (*utils.PageData, error) {
+func GetMonitorTargetPage(pageIndex int, pageSize int, prometheusId int, monitorResourceId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorTargetPage, 0)
 	tx := myorm.GetOrmDB().Table("monitor_target")
-	tx.Select("monitor_target.id","monitor_target.prometheus_id","monitor_target.monitor_resource_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","monitor_cluster.code as monitor_cluster_code","monitor_cluster.name as monitor_cluster_name","prometheus.name as prometheus_name","prometheus.url as prometheus_url","prometheus.monitor_cluster_id","monitor_resource.code as monitor_resource_code","monitor_resource.name as monitor_resource_name","monitor_resource.exporter")
+	tx.Select("monitor_target.id","monitor_target.prometheus_id","monitor_target.monitor_resource_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","prometheus.code as prometheus_code","prometheus.name as prometheus_name","prometheus.url as prometheus_url","monitor_resource.code as monitor_resource_code","monitor_resource.name as monitor_resource_name","monitor_resource.exporter")
 	tx.Joins("left join prometheus on prometheus.id = monitor_target.prometheus_id")
 	tx.Joins("left join monitor_resource on monitor_resource.id = monitor_target.monitor_resource_id")
-	tx.Joins("left join monitor_cluster on monitor_cluster.id = prometheus.monitor_cluster_id")
-	if monitorClusterId != 0 {
-		tx.Where("prometheus.monitor_cluster_id = ?", monitorClusterId)
-	}
 	if prometheusId != 0 {
 		tx.Where("monitor_target.prometheus_id = ?", prometheusId)
 	}
