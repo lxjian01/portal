@@ -47,3 +47,10 @@ type RecordingRule struct {
 	Expr   string `gorm:"column:expr;type:varchar(64)" json:"expr" form:"expr" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(64)" json:"remark" form:"remark" binding:"required"`
 }
+
+type RecordingRulePage struct {
+	RecordingRule
+	PrometheusCode   string `gorm:"column:prometheus_code" json:"prometheusCode"`
+	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
+	PrometheusUrl   string `gorm:"column:prometheus_url" json:"prometheusUrl"`
+}

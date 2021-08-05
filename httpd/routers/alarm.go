@@ -22,5 +22,11 @@ func AlarmRoutes(route *gin.Engine) {
 		user.DELETE("/user/:id", alarm.DeleteAlarmUser)
 		user.GET("/user/list", alarm.GetAlarmUserList)
 		user.GET("/user/page", alarm.GetAlarmUserPage)
+
+		// alarm recording rule
+		user.POST("/recording/rule", alarm.AddRecordingRule)
+		user.PUT("/recording/rule/:id", alarm.UpdateRecordingRule)
+		user.DELETE("/recording/rule/:id", alarm.DeleteRecordingRule)
+		user.GET("/recording/rule/page", alarm.GetRecordingRulePage)
 	}
 }

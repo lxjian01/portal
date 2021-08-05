@@ -21,7 +21,7 @@ func AddAlarmUser(c *gin.Context){
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	_, err := alarm.AddAlarmUser(&m)
 	if err != nil {
-		log.Errorf("Add system user error %s",err.Error())
+		log.Errorf("Add alarm user error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -39,7 +39,7 @@ func UpdateAlarmUser(c *gin.Context){
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
 	err := alarm.UpdateAlarmUser(&m)
 	if err != nil {
-		log.Errorf("Update system user id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update alarm user id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -56,7 +56,7 @@ func DeleteAlarmUser(c *gin.Context){
 	}
 	err = alarm.DeleteAlarmUser(id)
 	if err != nil {
-		log.Errorf("Delete system user id=%d error %s", id, err.Error())
+		log.Errorf("Delete alarm user id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}

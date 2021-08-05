@@ -10,18 +10,18 @@ import (
 	"strconv"
 )
 
-func AddAlarmGroup(c *gin.Context){
+func AddRecordingRule(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmGroupAdd
+	var m models.RecordingRule
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := alarm.AddAlarmGroup(&m)
+	_, err := alarm.AddRecordingRule(&m)
 	if err != nil {
-		log.Errorf("Add alarm group error %s",err.Error())
+		log.Errorf("Add recording rule error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddAlarmGroup(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateAlarmGroup(c *gin.Context){
+func UpdateRecordingRule(c *gin.Context){
 	var resp utils.Response
-	var m models.AlarmGroupAdd
+	var m models.RecordingRule
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := alarm.UpdateAlarmGroup(&m)
+	err := alarm.UpdateRecordingRule(&m)
 	if err != nil {
-		log.Errorf("Update alarm group id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update recording rule id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteAlarmGroup(c *gin.Context){
+func DeleteRecordingRule(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,45 +54,16 @@ func DeleteAlarmGroup(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	err = alarm.DeleteAlarmGroup(id)
+	_, err = alarm.DeleteRecordingRule(id)
 	if err != nil {
-		log.Errorf("Delete alarm group id=%d error %s", id, err.Error())
+		log.Errorf("Delete recording rule id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetAlarmGroupDetail(c *gin.Context){
-	resp := &utils.Response{}
-	obj := c.Param("id")
-	id, err := strconv.Atoi(obj)
-	if err != nil {
-		resp.ToMsgBadRequest(c, "参数id必须是整数")
-		return
-	}
-	data, err := alarm.GetAlarmGroupDetail(id)
-	if err != nil {
-		log.Errorf("Get alarm group id=%d error %s", id, err.Error())
-		resp.ToError(c, err)
-		return
-	}
-	resp.Data = data
-	resp.ToSuccess(c)
-}
-
-func GetAlarmGroupList(c *gin.Context){
-	resp := &utils.Response{}
-	data, err := alarm.GetAlarmGroupList()
-	if err != nil {
-		resp.ToMsgBadRequest(c, err.Error())
-		return
-	}
-	resp.Data = data
-	resp.ToSuccess(c)
-}
-
-func GetAlarmGroupPage(c *gin.Context){
+func GetRecordingRulePage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -114,8 +85,14 @@ func GetAlarmGroupPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	keywords := c.Query("keywords")
-	data, err := alarm.GetAlarmGroupPage(pageIndex, pageSize, keywords)
+	obj = c.DefaultQuery("prometheusId", "0")
+	prometheusId, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数prometheusId必须是整数")
+		return
+	}
+	name := c.Query("name")
+	data, err := alarm.GetRecordingRulePage(pageIndex, pageSize, prometheusId, name)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
