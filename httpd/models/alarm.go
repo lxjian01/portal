@@ -41,16 +41,23 @@ type AlarmGroupUser struct {
 
 type RecordingRule struct {
 	BaseModel
-	PrometheusId   int `gorm:"column:prometheus_id;type:int" json:"prometheusId" form:"prometheusId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Record   string `gorm:"column:record;type:varchar(64);uniqueIndex" json:"record" form:"record" binding:"required"`
 	Expr   string `gorm:"column:expr;type:varchar(64)" json:"expr" form:"expr" binding:"required"`
-	Remark   string `gorm:"column:remark;type:varchar(64)" json:"remark" form:"remark" binding:"required"`
+}
+
+type RecordingRuleAdd struct {
+	RecordingRule
+	PrometheusIds  []int         `gorm:"-" json:"prometheusIds" form:"prometheusIds" binding:"required"`
 }
 
 type RecordingRulePage struct {
 	RecordingRule
-	PrometheusCode   string `gorm:"column:prometheus_code" json:"prometheusCode"`
-	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
-	PrometheusUrl   string `gorm:"column:prometheus_url" json:"prometheusUrl"`
+	PrometheusList []interface{} `json:"prometheusList"`
+}
+
+type PrometheusRecordingRule struct {
+	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
+	PrometheusId   int `gorm:"column:prometheus_id;type:int" json:"prometheusId" form:"prometheusId" binding:"required"`
+	RecordingRuleId   int `gorm:"column:recording_rule_id;type:int" json:"recordingRuleId" form:"recordingRuleId" binding:"required"`
 }

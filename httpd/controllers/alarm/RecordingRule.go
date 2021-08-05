@@ -12,7 +12,7 @@ import (
 
 func AddRecordingRule(c *gin.Context){
 	var resp utils.Response
-	var m models.RecordingRule
+	var m models.RecordingRuleAdd
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return

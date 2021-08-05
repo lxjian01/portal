@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"errors"
 	consulapi "github.com/hashicorp/consul/api"
 	"gorm.io/gorm"
 	"portal/global/consul"
@@ -33,18 +34,19 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		// add monitor target alarm group
-		if len(m.AlarmGroupIds) > 0 {
-			var mtag []models.MonitorTargetAlarmGroup
-			for _, item := range m.AlarmGroupIds{
-				var alarmGroupUser models.MonitorTargetAlarmGroup
-				alarmGroupUser.MonitorTargetId = m.Id
-				alarmGroupUser.AlarmGroupId = item
-				mtag = append(mtag, alarmGroupUser)
-			}
-			err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
-			if err != nil {
-				return err
-			}
+		if len(m.AlarmGroupIds) <= 0 {
+			return errors.New("监控实例必须要关联告警组")
+		}
+		var mtag []models.MonitorTargetAlarmGroup
+		for _, item := range m.AlarmGroupIds{
+			var alarmGroupUser models.MonitorTargetAlarmGroup
+			alarmGroupUser.MonitorTargetId = m.Id
+			alarmGroupUser.AlarmGroupId = item
+			mtag = append(mtag, alarmGroupUser)
+		}
+		err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
+		if err != nil {
+			return err
 		}
 		// registry consul service
 		tags := make([]string, 0)
@@ -110,18 +112,19 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 			return err
 		}
 		// add monitor target alarm group
-		if len(m.AlarmGroupIds) > 0 {
-			var mtag []models.MonitorTargetAlarmGroup
-			for _, item := range m.AlarmGroupIds{
-				var alarmGroupUser models.MonitorTargetAlarmGroup
-				alarmGroupUser.MonitorTargetId = m.Id
-				alarmGroupUser.AlarmGroupId = item
-				mtag = append(mtag, alarmGroupUser)
-			}
-			err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
-			if err != nil {
-				return err
-			}
+		if len(m.AlarmGroupIds) <= 0 {
+			return errors.New("监控实例必须要关联告警组")
+		}
+		var mtag []models.MonitorTargetAlarmGroup
+		for _, item := range m.AlarmGroupIds{
+			var alarmGroupUser models.MonitorTargetAlarmGroup
+			alarmGroupUser.MonitorTargetId = m.Id
+			alarmGroupUser.AlarmGroupId = item
+			mtag = append(mtag, alarmGroupUser)
+		}
+		err = tx.Table("monitor_target_alarm_group").Create(&mtag).Error
+		if err != nil {
+			return err
 		}
 		// registry consul service
 		tags := make([]string, 0)
