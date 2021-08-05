@@ -77,15 +77,47 @@ func UpdateRecordingRule(m *models.RecordingRule) error {
 	return result.Error
 }
 
-func DeleteRecordingRule(id int) (int64, error) {
+func DeleteRecordingRule(id int) error {
 	// delete recording rule
-	result := myorm.GetOrmDB().Table("recording_rule").Where("id = ?", id).Delete(&models.Prometheus{})
-	return result.RowsAffected, result.Error
+	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find prometheus
+		prometheusList := make([]prometheusRecordingRuleList, 0)
+		err := myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Where("prometheus_recording_rule.recording_rule_id = ?", id).Find(&prometheusList).Error
+		if err != nil {
+			return err
+		}
+		// delete prometheus recording rule
+		err = tx.Table("prometheus_recording_rule").Where("recording_rule_id = ?", id).Delete(&models.PrometheusRecordingRule{}).Error
+		if err != nil {
+			return err
+		}
+		// delete recording rule
+		recordingRule := models.RecordingRule{}
+		tx.Table("recording_rule").Where("id = ?", id).Find(&recordingRule)
+		err = tx.Table("recording_rule").Where("id = ?", id).Delete(&models.Prometheus{}).Error
+		if err != nil {
+			return err
+		}
+
+		// delete consul Key/Value
+		for _, item := range prometheusList {
+			code := item.PrometheusCode
+			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, recordingRule.Record)
+			client := consul.GetClient()
+			_, consulErr := client.KV().Delete(key, nil)
+			if consulErr != nil {
+				log.Errorf("Delete prometheus %s rule recording error by %s", code, consulErr)
+			}
+		}
+		return err
+	})
+	return err
 }
 
 type prometheusRecordingRuleList struct {
 	RecordingRuleId int `gorm:"column:recording_rule_id" json:"recordingRuleId"`
 	PrometheusId int `gorm:"column:prometheus_id" json:"prometheusId"`
+	PrometheusCode string `gorm:"column:prometheus_code" json:"prometheusCode"`
 	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
 }
 
@@ -103,7 +135,7 @@ func GetRecordingRulePage(pageIndex int, pageSize int, keywords string) (*utils.
 	}
 
 	recordings := make([]prometheusRecordingRuleList, 0)
-	myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Find(&recordings)
+	myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Find(&recordings)
 	for index, item := range dataList {
 		for _, recording := range recordings {
 			if item.Id == recording.RecordingRuleId {

@@ -54,7 +54,7 @@ func DeleteRecordingRule(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = alarm.DeleteRecordingRule(id)
+	err = alarm.DeleteRecordingRule(id)
 	if err != nil {
 		log.Errorf("Delete recording rule id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
