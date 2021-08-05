@@ -96,8 +96,8 @@ func GetAlarmUserPage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	userName := c.Query("userName")
-	data, err := alarm.GetAlarmUserPage(pageIndex, pageSize, userName)
+	name := c.Query("name")
+	data, err := alarm.GetAlarmUserPage(pageIndex, pageSize, name)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

@@ -21,8 +21,8 @@ func AddAlarmGroup(m *models.AlarmGroupAdd) (int, error) {
 			for _, item := range m.Users{
 				var alarmGroupUser models.AlarmGroupUser
 				userId := item
-				alarmGroupUser.GroupId = m.Id
-				alarmGroupUser.UserId = userId
+				alarmGroupUser.AlarmGroupId = m.Id
+				alarmGroupUser.AlarmUserId = userId
 				alarmGroupUserList = append(alarmGroupUserList, alarmGroupUser)
 			}
 			err = tx.Table("alarm_group_user").Create(&alarmGroupUserList).Error
@@ -35,7 +35,7 @@ func AddAlarmGroup(m *models.AlarmGroupAdd) (int, error) {
 func UpdateAlarmGroup(m *models.AlarmGroupAdd) error {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// delete alarm group user
-		err := tx.Table("alarm_group_user").Where("group_id = ?", m.Id).Delete(&models.AlarmGroupUser{}).Error
+		err := tx.Table("alarm_group_user").Where("alarm_group_id = ?", m.Id).Delete(&models.AlarmGroupUser{}).Error
 		if err != nil {
 			return err
 		}
@@ -45,8 +45,8 @@ func UpdateAlarmGroup(m *models.AlarmGroupAdd) error {
 			for _, item := range m.Users{
 				var alarmGroupUser models.AlarmGroupUser
 				userId := item
-				alarmGroupUser.GroupId = m.Id
-				alarmGroupUser.UserId = userId
+				alarmGroupUser.AlarmGroupId = m.Id
+				alarmGroupUser.AlarmUserId = userId
 				alarmGroupUserList = append(alarmGroupUserList, alarmGroupUser)
 			}
 			err = tx.Table("alarm_group_user").Create(&alarmGroupUserList).Error
@@ -61,12 +61,12 @@ func UpdateAlarmGroup(m *models.AlarmGroupAdd) error {
 func DeleteAlarmGroup(id int) error {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
 		// monitor target alert group exists
-		var monitorTargetAlertGroupCount int64
-		err := myorm.GetOrmDB().Table("monitor_target_alert_group").Where("alert_group_id = ?", id).Count(&monitorTargetAlertGroupCount).Error
+		var monitorTargetAlarmGroupCount int64
+		err := myorm.GetOrmDB().Table("monitor_target_alarm_group").Where("alarm_group_id = ?", id).Count(&monitorTargetAlarmGroupCount).Error
 		if err != nil {
 			return err
 		}
-		if monitorTargetAlertGroupCount > 0 {
+		if monitorTargetAlarmGroupCount > 0 {
 			return errors.New("告警组下存在监控指标，不允许删除")
 		}
 		// delete alarm group user
@@ -83,20 +83,20 @@ func DeleteAlarmGroup(id int) error {
 
 type user struct {
 	Id  int
-	UserId int
-	UserName string
-	GroupId int
+	AlarmUserId int
+	AlarmUserName string
+	AlarmGroupId int
 }
 
 func GetAlarmGroupDetail(id int) (*models.AlarmGroupAdd, error) {
 	var m models.AlarmGroupAdd
 	myorm.GetOrmDB().Table("alarm_group").Where("id = ?", id).First(&m)
 	var users []user
-	myorm.GetOrmDB().Table("alarm_group_user").Select("alarm_group_user.id","alarm_group_user.group_id","alarm_group_user.user_id","alarm_user.user_name").Joins("left join alarm_user on alarm_group_user.user_id = alarm_user.id").Find(&users)
+	myorm.GetOrmDB().Table("alarm_group_user").Select("alarm_group_user.id","alarm_group_user.alarm_group_id","alarm_group_user.alarm_user_id","alarm_user.name as alarm_user_name").Joins("left join alarm_user on alarm_group_user.alarm_user_id = alarm_user.id").Find(&users)
 	for _, u := range users {
-		value := u.GroupId
+		value := u.AlarmGroupId
 		if m.Id == value {
-			m.Users = append(m.Users, u.UserId)
+			m.Users = append(m.Users, u.AlarmUserId)
 		}
 	}
 	return &m, nil
@@ -121,12 +121,12 @@ func GetAlarmGroupPage(pageIndex int, pageSize int, keywords string) (*utils.Pag
 	}
 
 	var users []user
-	myorm.GetOrmDB().Table("alarm_group_user").Select("alarm_group_user.id","alarm_group_user.group_id","alarm_group_user.user_id","alarm_user.user_name").Joins("left join alarm_user on alarm_group_user.user_id = alarm_user.id").Find(&users)
+	myorm.GetOrmDB().Table("alarm_group_user").Select("alarm_group_user.id","alarm_group_user.alarm_group_id","alarm_group_user.alarm_user_id","alarm_user.name as alarm_user_name").Joins("left join alarm_user on alarm_group_user.alarm_user_id = alarm_user.id").Find(&users)
 	for index, item := range dataList {
 		for _, pitem := range users {
-			if item.Id == pitem.GroupId {
+			if item.Id == pitem.AlarmGroupId {
 				value := pitem
-				dataList[index].Users = append(dataList[index].Users, value.UserName)
+				dataList[index].Users = append(dataList[index].Users, value.AlarmUserName)
 			}
 		}
 	}

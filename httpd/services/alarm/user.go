@@ -16,7 +16,7 @@ func AddAlarmUser(m *models.AlarmUser) (int, error) {
 }
 
 func UpdateAlarmUser(m *models.AlarmUser) error {
-	result := myorm.GetOrmDB().Table("alarm_user").Select("user_name","phone","email","weixin").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("alarm_user").Select("name","phone","email","weixin").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -40,16 +40,16 @@ func DeleteAlarmUser(id int) error {
 
 func GetAlarmUserList() (*[]models.AlarmUserList, error) {
 	dataList := make([]models.AlarmUserList, 0)
-	myorm.GetOrmDB().Table("alarm_user").Select("id","user_name").Find(&dataList)
+	myorm.GetOrmDB().Table("alarm_user").Select("id","name").Find(&dataList)
 	return &dataList, nil
 }
 
-func GetAlarmUserPage(pageIndex int, pageSize int, userName string) (*utils.PageData, error) {
+func GetAlarmUserPage(pageIndex int, pageSize int, name string) (*utils.PageData, error) {
 	dataList := make([]models.AlarmUser, 0)
 	tx := myorm.GetOrmDB().Table("alarm_user")
-	if userName != "" {
-		likeStr := "%" + userName + "%"
-		tx.Where("user_name like ?", likeStr)
+	if name != "" {
+		likeStr := "%" + name + "%"
+		tx.Where("name like ?", likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
