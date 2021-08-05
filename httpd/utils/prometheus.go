@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"net/http"
 	"github.com/alecthomas/template"
+	"net/http"
 )
 
 func PrometheusReload(url string) error {
@@ -33,9 +33,28 @@ const ruleTemplate = `  - alert: '{{ Key . }}'
       value: {{"'{{$value}}'"}}
 `
 
-const RecordingTemplate = `  - record: {{ .Record }}
+const RecordingRuleTemplate = `  - record: {{ .Record }}
     expr: {{ .Expr }}
 `
+
+type RecordingRule struct {
+	Record  string        `json:"record"`
+	Expr    string        `json:"expr"`
+}
+
+func GetRecordingRuleTemplate(rule *RecordingRule) (string, error) {
+	t := template.New("recording_rule")
+	t, err := t.Parse(RecordingRuleTemplate)
+	if err != nil {
+		return "", err
+	}
+	var b bytes.Buffer
+	err = t.Execute(&b, rule)
+	if err != nil {
+		return "", err
+	}
+	return b.String(), nil
+}
 
 type APIRule struct {
 	Id     string `json:"id" bson:"_id" yaml:"id"`
@@ -75,19 +94,7 @@ func (a *APIRule) GetKey() string {
 	return a.Id + "_" + a.Metric
 }
 
-type Recording struct {
-	Id      string `json:"id" bson:"_id"`
-	IdStr   string        `json:"id_str"`
-	Envs    []string      `json:"envs"`
-	Desc    string        `json:"desc"`
-	Record  string        `json:"record"`
-	Expr    string        `json:"expr"`
-	Disable bool          `json:"disable"`
-}
 
-func (r *Recording) GetKey() string {
-	return r.Id + "_" + r.Record
-}
 
 // AlertGroup 告警组
 type AlertGroup struct {
@@ -132,20 +139,6 @@ func getRuleTemplate(rule *APIRule) (string, error) {
 	}
 	var b bytes.Buffer
 	err = t.Execute(&b, rule)
-	if err != nil {
-		return "", err
-	}
-	return b.String(), nil
-}
-
-func getRecordingTemplate(r *Recording) (string, error) {
-	t := template.New("recording")
-	t, err := t.Parse(RecordingTemplate)
-	if err != nil {
-		return "", err
-	}
-	var b bytes.Buffer
-	err = t.Execute(&b, r)
 	if err != nil {
 		return "", err
 	}

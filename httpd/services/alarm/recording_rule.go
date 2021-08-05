@@ -2,17 +2,37 @@ package alarm
 
 import (
 	"errors"
+	"fmt"
+	"github.com/hashicorp/consul/api"
 	"gorm.io/gorm"
+	"portal/global/consul"
+	"portal/global/log"
 	"portal/global/myorm"
 	"portal/httpd/models"
 	"portal/httpd/utils"
 )
 
+func put(key string, value string) error {
+	client := consul.GetClient()
+	kv := client.KV()
+	p := &api.KVPair{Key: key, Value: []byte(value)}
+	_, err := kv.Put(p, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func AddRecordingRule(m *models.RecordingRuleAdd) (int, error) {
-	prometheusUrl := ""
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find prometheus
+		var prometheusList []models.Prometheus
+		err := tx.Table("prometheus").Where("id in ?", m.PrometheusIds).Find(&prometheusList).Error
+		if err != nil {
+			return err
+		}
 		// add recording rule
-		err := tx.Table("recording_rule").Create(m).Error
+		err = tx.Table("recording_rule").Create(m).Error
 		if err != nil {
 			return err
 		}
@@ -31,40 +51,24 @@ func AddRecordingRule(m *models.RecordingRuleAdd) (int, error) {
 		if err != nil {
 			return err
 		}
-		//// registry consul service
-		//tags := make([]string, 0)
-		//tags = append(tags, prometheus.Code)
-		//tags = append(tags, monitorResource.Exporter)
-		//meta := make(map[string]string, 0)
-		//meta["resource"] = monitorResource.Code
-		//client := consul.GetClient()
-		//ip := strings.Split(m.Url,"/")[2]
-		//tempIp := strings.Split(ip,":")
-		//address := tempIp[0]
-		//port,err := strconv.Atoi(tempIp[1])
-		//if err != nil {
-		//	return err
-		//}
-		//check := consulapi.AgentServiceCheck{
-		//	HTTP:     m.Url,
-		//	Interval: m.Interval,
-		//}
-		//serviceId := strconv.Itoa(m.Id)
-		//registration := consulapi.AgentServiceRegistration{
-		//	ID: serviceId,
-		//	Name: m.Name,
-		//	Address: address,
-		//	Port: port,
-		//	Tags: tags,
-		//	Meta:  meta,
-		//	Check: &check,
-		//}
-		//err = client.Agent().ServiceRegister(&registration)
+		// registry consul Key/Value
+		rule := utils.RecordingRule{}
+		rule.Record = m.Record
+		rule.Expr = m.Expr
+		template, err := utils.GetRecordingRuleTemplate(&rule)
+		if err != nil {
+			return err
+		}
+		for _, item := range prometheusList {
+			code := item.Code
+			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
+			consulErr := put(key,template)
+			if consulErr != nil {
+				log.Errorf("Put prometheus %s rule recording error by %s", code, consulErr)
+			}
+		}
 		return err
 	})
-
-	// reload prometheus
-	err = utils.PrometheusReload(prometheusUrl)
 	return m.Id, err
 }
 
@@ -79,14 +83,16 @@ func DeleteRecordingRule(id int) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
-func GetRecordingRulePage(pageIndex int, pageSize int, prometheusId int, keywords string) (*utils.PageData, error) {
-	dataList := make([]models.Prometheus, 0)
+type prometheusRecordingRuleList struct {
+	RecordingRuleId int `gorm:"column:recording_rule_id" json:"recordingRuleId"`
+	PrometheusId int `gorm:"column:prometheus_id" json:"prometheusId"`
+	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
+}
+
+func GetRecordingRulePage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
+	dataList := make([]models.RecordingRulePage, 0)
 	tx := myorm.GetOrmDB().Table("recording_rule")
-	tx.Select("recording_rule.id","recording_rule.prometheus_id","recording_rule.name","recording_rule.record","recording_rule.expr","prometheus.update_user","prometheus.update_time","prometheus.code as prometheus_code","prometheus.name as prometheus_name","prometheus.url as prometheus_url")
-	tx.Joins("left join prometheus on prometheus.id = recording_rule.prometheus_id")
-	if prometheusId != 0 {
-		tx.Where("recording_rule.prometheus_id = ?", prometheusId)
-	}
+	tx.Select("recording_rule.id","recording_rule.name","recording_rule.record","recording_rule.expr","recording_rule.update_user","recording_rule.update_time")
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
 		tx.Where("recording_rule.name like ? or recording_rule.record like ? or recording_rule.expr like ?", likeStr, likeStr, likeStr)
@@ -95,6 +101,18 @@ func GetRecordingRulePage(pageIndex int, pageSize int, prometheusId int, keyword
 	if err != nil {
 		return nil, err
 	}
+
+	recordings := make([]prometheusRecordingRuleList, 0)
+	myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Find(&recordings)
+	for index, item := range dataList {
+		for _, recording := range recordings {
+			if item.Id == recording.RecordingRuleId {
+				value := recording
+				dataList[index].PrometheusList = append(dataList[index].PrometheusList, &value)
+			}
+		}
+	}
+
 	pageData.Data = &dataList
 	return pageData, nil
 }
