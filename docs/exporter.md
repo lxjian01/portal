@@ -3,9 +3,9 @@
 linux主机监控，提供cpu、内存、磁盘io、网络io、分区等监控数据  
 https://github.com/prometheus/node_exporter
 
-* wmi exporter  
+* windows exporter
 windows主机监控，与node_exporter类似  
-https://github.com/martinlindhe/wmi_exporter
+https://github.com/prometheus-community/windows_exporter
 
 * blackbox exporter  
 提供HTTP, HTTPS, DNS, TCP and ICMP等地址探测监控功能，主要用于存活性监控  
