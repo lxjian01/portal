@@ -72,9 +72,74 @@ func AddRecordingRule(m *models.RecordingRuleAdd) (int, error) {
 	return m.Id, err
 }
 
-func UpdateRecordingRule(m *models.RecordingRule) error {
-	result := myorm.GetOrmDB().Table("recording_rule").Select("prometheus_id","name","record","expr").Where("id = ?", m.Id).Updates(m)
-	return result.Error
+func UpdateRecordingRule(m *models.RecordingRuleAdd) error {
+	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
+		// find prometheus
+		var prometheusList []models.Prometheus
+		err := tx.Table("prometheus").Where("id in ?", m.PrometheusIds).Find(&prometheusList).Error
+		if err != nil {
+			return err
+		}
+		// update recording rule
+		err = tx.Table("recording_rule").Select("prometheus_id","name","expr").Where("id = ?", m.Id).Updates(m).Error
+		if err != nil {
+			return err
+		}
+		// find prometheus recording rule list
+		oldPrometheusList := make([]prometheusRecordingRuleList, 0)
+		err = myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Where("prometheus_recording_rule.recording_rule_id = ?", m.Id).Find(&oldPrometheusList).Error
+		if err != nil {
+			return err
+		}
+		// delete prometheus recording rule
+		err = tx.Table("prometheus_recording_rule").Where("recording_rule_id = ?", m.Id).Delete(&models.PrometheusRecordingRule{}).Error
+		if err != nil {
+			return err
+		}
+		// add prometheus recording rule
+		if len(m.PrometheusIds) <= 0 {
+			return errors.New("Recording rule必须要关联prometheus实例")
+		}
+		var prr []models.PrometheusRecordingRule
+		for _, prometheusId := range m.PrometheusIds{
+			var prometheusRecordingRule models.PrometheusRecordingRule
+			prometheusRecordingRule.RecordingRuleId = m.Id
+			prometheusRecordingRule.PrometheusId = prometheusId
+			prr = append(prr, prometheusRecordingRule)
+		}
+		err = tx.Table("prometheus_recording_rule").Create(&prr).Error
+		if err != nil {
+			return err
+		}
+		// delete consul Key/Value
+		for _, item := range oldPrometheusList {
+			code := item.PrometheusCode
+			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
+			client := consul.GetClient()
+			_, consulErr := client.KV().Delete(key, nil)
+			if consulErr != nil {
+				log.Errorf("Delete prometheus %s rule recording error by %s", code, consulErr)
+			}
+		}
+		// registry consul Key/Value
+		rule := utils.RecordingRule{}
+		rule.Record = m.Record
+		rule.Expr = m.Expr
+		template, err := utils.GetRecordingRuleTemplate(&rule)
+		if err != nil {
+			return err
+		}
+		for _, item := range prometheusList {
+			code := item.Code
+			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
+			consulErr := put(key,template)
+			if consulErr != nil {
+				log.Errorf("Put prometheus %s rule recording error by %s", code, consulErr)
+			}
+		}
+		return err
+	})
+	return err
 }
 
 func DeleteRecordingRule(id int) error {
