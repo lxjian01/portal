@@ -27,9 +27,9 @@ const ruleTemplate = `  - alert: '{{ Key . }}'
     labels:
       severity: {{.Severity}}
     annotations:
-      group: '{{.Group}}'
-      desc: '{{.Desc}}'
       summary: '{{.Summary}}'
+      description: '{{.Description}}'
+      group: '{{.Group}}'
       value: {{"'{{$value}}'"}}
 `
 
@@ -66,7 +66,7 @@ type APIRule struct {
 	Expr     string `json:"expr" yaml:"expr"`
 	For      string `json:"for" yaml:"for"`
 	Severity string `json:"severity" yaml:"severity"`
-	Desc     string `json:"desc" yaml:"desc"`
+	Description     string `json:"description" yaml:"description"`
 	Summary  string `json:"summary" yaml:"summary"`
 	// Object         string              `json:"object" yaml:"object"`
 	// Left           string                 `json:"left" yaml:"left"`
