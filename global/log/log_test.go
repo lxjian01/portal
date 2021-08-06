@@ -1,14 +1,14 @@
 package log
 
 import (
-	"bn-cmdb/config"
+	"portal/config"
 	"testing"
 	"time"
 )
 
 func TestInit(t *testing.T) {
 	logConfig := &config.LogConfig{
-		Dir:       "/data/cmdb/",
+		Dir:       "/data/portal/",
 		Name:      "go.log",
 		Format:    "1", //no use right now
 		RetainDay: 7,
