@@ -15,7 +15,7 @@ func AddMonitorResource(m *models.MonitorResource) (int, error) {
 }
 
 func UpdateMonitorResource(m *models.MonitorResource) error {
-	result := myorm.GetOrmDB().Table("monitor_resource").Select("code","name","exporter","github_url","template","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_resource").Select("code","name","exporter","git_url","template","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 

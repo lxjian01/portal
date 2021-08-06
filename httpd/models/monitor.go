@@ -18,7 +18,7 @@ type MonitorResource struct {
 	Code   string `gorm:"column:code;type:varchar(64)" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
-	GithubUrl   string `gorm:"column:github_url;type:varchar(64)" json:"githubUrl" form:"githubUrl" binding:"required"`
+	GitUrl   string `gorm:"column:git_url;type:varchar(64)" json:"gitUrl" form:"gitUrl" binding:"required"`
 	Template   string `gorm:"column:template;type:varchar(512)" json:"template" form:"template" binding:""`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
