@@ -33,6 +33,7 @@ func GetMonitorResourceList() (*[]models.MonitorResourceList, error) {
 func GetMonitorResourcePage(pageIndex int, pageSize int, exporter, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorResource, 0)
 	tx := myorm.GetOrmDB().Table("monitor_resource")
+	tx.Select("id","code","name","exporter","remark","update_user","update_time")
 	if exporter != "" {
 		tx.Where("exporter = ?", exporter)
 	}
