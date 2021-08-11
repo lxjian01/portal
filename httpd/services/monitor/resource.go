@@ -15,7 +15,7 @@ func AddMonitorResource(m *models.MonitorResource) (int, error) {
 }
 
 func UpdateMonitorResource(m *models.MonitorResource) error {
-	result := myorm.GetOrmDB().Table("monitor_resource").Select("code","name","exporter","git_url","template","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("monitor_resource").Select("code","name","exporter","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -30,12 +30,15 @@ func GetMonitorResourceList() (*[]models.MonitorResourceList, error) {
 	return &dataList, nil
 }
 
-func GetMonitorResourcePage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
+func GetMonitorResourcePage(pageIndex int, pageSize int, exporter, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorResource, 0)
 	tx := myorm.GetOrmDB().Table("monitor_resource")
+	if exporter != "" {
+		tx.Where("exporter = ?", exporter)
+	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("code like ? or name like ? or exporter like ?", likeStr, likeStr, likeStr)
+		tx.Where("code like ? or name like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
