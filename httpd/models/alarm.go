@@ -80,13 +80,11 @@ type AlertingMetricList struct {
 
 type AlertingRule struct {
 	BaseModel
-	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
-	Alert   string `gorm:"column:alert;type:varchar(128);uniqueIndex" json:"alert" form:"alert" binding:"required"`
+	AlertingMetricId   string `gorm:"column:alerting_metric_id;type:varchar(64)" json:"alertingMetricId" form:"alertingMetricId" binding:"required"`
+	ThresholdValue   string `gorm:"column:threshold_value;type:int;uniqueIndex" json:"alert" form:"alert" binding:"required"`
 	Expr   string `gorm:"column:expr;type:varchar(256)" json:"expr" form:"expr" binding:"required"`
-	For   string `gorm:"column:for;type:varchar(16)" json:"for" form:"for" binding:"required"`
+	AlertingFor   string `gorm:"column:alerting_for;type:varchar(16)" json:"alertingFor" form:"alertingFor" binding:"required"`
 	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
-	Summary   string `gorm:"column:summary;type:varchar(128)" json:"summary" form:"summary" binding:"required"`
-	Description   string `gorm:"column:description;type:varchar(512)" json:"description" form:"description" binding:"required"`
 }
 
 type AlertingRuleAdd struct {
