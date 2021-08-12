@@ -2,7 +2,8 @@
 Prometheus - based unified alarm monitoring platform that allows you to monitor openstack, Kubernetes, Database, networks, apps, etc
 
 ## exporter list
-https://github.com/lxjian01/portal/blob/develop/docs/exporter.md
+* https://github.com/lxjian01/portal/blob/develop/docs/exporter.md  
+* Prometheus Alert please refer to https://awesome-prometheus-alerts.grep.to/
 
 ## portal front address
 * https://github.com/lxjian01/portal-front  
