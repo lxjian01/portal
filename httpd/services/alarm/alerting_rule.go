@@ -13,16 +13,20 @@ type prometheusAlertingRuleList struct {
 	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
 }
 
-func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, keywords string) (*utils.PageData, error) {
+func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, alertingMetricId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.AlertingRulePage, 0)
 	tx := myorm.GetOrmDB().Table("alerting_rule")
-	tx.Select("id","exporter","alert","expr","for","severity","summary","description","update_user","update_time")
+	tx.Select("alerting_rule.id","alerting_rule.alerting_metric_id","alerting_rule.operator","alerting_rule.threshold_value","alerting_rule.alerting_for","alerting_rule.severity","alerting_rule.update_user","alerting_rule.update_time","alerting_metric.exporter","alerting_metric.code","alerting_metric.name","alerting_metric.metric","alerting_metric.summary","alerting_metric.description")
+	tx.Joins("left join alerting_metric on alerting_metric.id = alerting_rule.alerting_metric_id")
 	if exporter != "" {
-		tx.Where("exporter = ?", exporter)
+		tx.Where("alerting_metric.exporter = ?", exporter)
+	}
+	if alertingMetricId != 0 {
+		tx.Where("alerting_rule.alerting_metric_id = ?", alertingMetricId)
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("alert like ? or expr like ? or severity like ? or summary like ?", likeStr, likeStr, likeStr, likeStr)
+		tx.Where("alerting_metric.code like ? or alerting_metric.name like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
@@ -30,7 +34,7 @@ func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, keywords 
 	}
 
 	alertings := make([]prometheusAlertingRuleList, 0)
-	myorm.GetOrmDB().Table("prometheus_alerting_rule").Select("prometheus_alerting_rule.recording_rule_id", "prometheus_alerting_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_alerting_rule.prometheus_id = prometheus.id").Find(&alertings)
+	myorm.GetOrmDB().Table("prometheus_alerting_rule").Select("prometheus_alerting_rule.alerting_rule_id", "prometheus_alerting_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_alerting_rule.prometheus_id = prometheus.id").Find(&alertings)
 	for index, item := range dataList {
 		for _, alerting := range alertings {
 			if item.Id == alerting.AlertingRuleId {
@@ -43,3 +47,4 @@ func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, keywords 
 	pageData.Data = &dataList
 	return pageData, nil
 }
+

@@ -65,7 +65,8 @@ func DeleteAlertingMetric(c *gin.Context){
 
 func GetAlertingMetricList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := alarm.GetAlertingMetricList()
+	exporter := c.Query("exporter")
+	data, err := alarm.GetAlertingMetricList(exporter)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

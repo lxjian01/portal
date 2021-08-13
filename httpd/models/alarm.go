@@ -42,7 +42,7 @@ type AlarmGroupUser struct {
 type RecordingRule struct {
 	BaseModel
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
-	Record   string `gorm:"column:record;type:varchar(64);uniqueIndex" json:"record" form:"record" binding:"required"`
+	Record   string `gorm:"column:record;type:varchar(64)" json:"record" form:"record" binding:"required"`
 	Expr   string `gorm:"column:expr;type:varchar(64)" json:"expr" form:"expr" binding:"required"`
 }
 
@@ -65,7 +65,7 @@ type PrometheusRecordingRule struct {
 type AlertingMetric struct {
 	BaseModel
 	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
-	Code   string `gorm:"column:code;type:varchar(64);uniqueIndex" json:"code" form:"code" binding:"required"`
+	Code   string `gorm:"column:code;type:varchar(64)" json:"code" form:"code" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Metric   string `gorm:"column:metric;type:varchar(256)" json:"metric" form:"metric" binding:"required"`
 	Summary   string `gorm:"column:summary;type:varchar(128)" json:"summary" form:"summary" binding:"required"`
@@ -74,15 +74,15 @@ type AlertingMetric struct {
 }
 
 type AlertingMetricList struct {
-	Code int `gorm:"column:code" json:"code"`
+	Id int `gorm:"column:id" json:"id"`
 	Name   string `gorm:"column:name" json:"name"`
 }
 
 type AlertingRule struct {
 	BaseModel
 	AlertingMetricId   string `gorm:"column:alerting_metric_id;type:varchar(64)" json:"alertingMetricId" form:"alertingMetricId" binding:"required"`
-	ThresholdValue   string `gorm:"column:threshold_value;type:int;uniqueIndex" json:"alert" form:"alert" binding:"required"`
-	Expr   string `gorm:"column:expr;type:varchar(256)" json:"expr" form:"expr" binding:"required"`
+	Operator   string `gorm:"column:operator;type:varchar(16)" json:"operator" form:"operator" binding:"required"`
+	ThresholdValue   string `gorm:"column:threshold_value;type:int" json:"thresholdValue" form:"thresholdValue" binding:"required"`
 	AlertingFor   string `gorm:"column:alerting_for;type:varchar(16)" json:"alertingFor" form:"alertingFor" binding:"required"`
 	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
 }
@@ -93,7 +93,13 @@ type AlertingRuleAdd struct {
 }
 
 type AlertingRulePage struct {
-	RecordingRule
+	AlertingRule
+	Exporter   string `gorm:"column:exporter" json:"exporter"`
+	Code   string `gorm:"column:code" json:"code" form:"code"`
+	Name   string `gorm:"column:name" json:"name" form:"name"`
+	Metric   string `gorm:"column:metric" json:"metric"`
+	Summary   string `gorm:"column:summary" json:"summary"`
+	Description   string `gorm:"column:description" json:"description"`
 	PrometheusList []interface{} `json:"prometheusList"`
 }
 
