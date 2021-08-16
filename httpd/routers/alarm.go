@@ -38,5 +38,8 @@ func AlarmRoutes(route *gin.Engine) {
 
 		// alarm alerting rule
 		user.GET("/alerting/rule/page", alarm.GetAlertingRulePage)
+
+		// alarm sender
+		user.POST("/sender", alarm.AddAlarmSender)
 	}
 }

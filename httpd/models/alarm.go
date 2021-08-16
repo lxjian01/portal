@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type AlarmGroup struct {
 	BaseModel
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
@@ -107,4 +109,39 @@ type PrometheusAlertingRule struct {
 	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
 	PrometheusId   int `gorm:"column:prometheus_id;type:int" json:"prometheusId" form:"prometheusId" binding:"required"`
 	AlertingRuleId   int `gorm:"column:alerting_rule_id;type:int" json:"alertingRuleId" form:"alertingRuleId" binding:"required"`
+}
+
+type AlarmNotice struct {
+	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
+	PrometheusCode   string `gorm:"column:prometheus_code;type:varchar(64)" json:"prometheusCode" form:"prometheusCode" binding:"required"`
+	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
+	Resource   string `gorm:"column:exporter;type:varchar(64)" json:"resource" form:"resource" binding:"required"`
+	Fingerprint   string `gorm:"column:fingerprint;type:varchar(64)" json:"fingerprint" form:"fingerprint" binding:"required"`
+	AlertName   string `gorm:"column:alert_name;type:varchar(64)" json:"alert_name" form:"alert_name" binding:"required"`
+	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
+	AlarmNumber   string `gorm:"column:alarm_number;type:int" json:"alarmNumber" form:"alarmNumber" binding:"required"`
+	CreateTime MyTime `gorm:"column:create_time;type:datetime;autoCreateTime" json:"createTime"`
+	UpdateTime MyTime `gorm:"column:update_time;type:datetime;autoUpdateTime" json:"updateTime"`
+}
+
+type Alert struct {
+	Status string `json:"status"`
+	Labels map[string]interface{} `json:"labels"`
+	Annotations map[string]string `json:"annotations"`
+	Fingerprint string `json:"fingerprint"`
+	StartsAt time.Time `json:"startsAt"`
+	EndsAt time.Time `json:"endsAt"`
+}
+
+type Notice struct {
+	Version string `json:"version"`
+	GroupKey string `json:"groupkey"`
+	Status string `json:"status"`
+	Receiver string `json:"receiver"`
+	TruncatedAlerts int `json:"truncatedAlerts"`
+	GroupLabels map[string]string `json:"groupLabels"`
+	CommonLabels map[string]string `json:"commonLabels"`
+	CommonAnnotations map[string]string `json:"commonAnnotations"`
+	ExternalUrl string `json:"externalUrl"`
+	Alerts []Alert `json:"alerts"`
 }
