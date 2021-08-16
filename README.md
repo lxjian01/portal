@@ -1,9 +1,14 @@
 # portal
-基于prometheus的统一监控告警平台，你可以用它监控openstack、kubernetes、database、network、app等
+Prometheus - based unified alarm monitoring platform that allows you to monitor openstack, Kubernetes, Database, networks, apps, etc
 
-## exporter列表
-https://github.com/lxjian01/portal/blob/develop/docs/exporter.md
+## exporter list
+* https://github.com/lxjian01/portal/blob/develop/docs/exporter.md  
+* Prometheus Alert please refer to https://awesome-prometheus-alerts.grep.to/
 
-## 技术架构
-prometheus + consul + mysql  
-你也可以根据自己情况调整，比如数据库使用mongo
+## portal front address
+* https://github.com/lxjian01/portal-front  
+* vue + element-ui
+
+## technical framework
+* prometheus + consul + mysql  
+* You can also adjust to your own situation, such as using Mongo for your database

@@ -24,10 +24,10 @@ func StartHttpdServer(c *config.HttpdConfig) {
 	Host := c.Host
 	Port := strconv.Itoa(c.Port)
 	addr := net.JoinHostPort(Host, Port)
-	log.Info("Start HTTP server at", addr)
-	err1 := router.Run(addr)
-	if err1 != nil{
-		log.Error("Start server error by",err1)
+	log.Infof("Start HTTP server at %s", addr)
+	err := router.Run(addr)
+	if err != nil{
+		log.Errorf("Start server error by %v",err)
 	}
 	log.Info("Start server ok")
 }

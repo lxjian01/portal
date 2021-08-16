@@ -28,7 +28,7 @@ const ruleTemplate = `  - alert: '{{ Key . }}'
       severity: {{.Severity}}
     annotations:
       summary: '{{.Summary}}'
-      description: '{{.Description}}'
+      description: '{{.Description}}'l
       group: '{{.Group}}'
       value: {{"'{{$value}}'"}}
 `
