@@ -1,27 +1,27 @@
-package monitor
+package alarm
 
 import (
 	"github.com/gin-gonic/gin"
 	"portal/global/log"
 	"portal/httpd/middlewares"
 	"portal/httpd/models"
-	"portal/httpd/services/monitor"
+	"portal/httpd/services/alarm"
 	"portal/httpd/utils"
 	"strconv"
 )
 
-func AddMonitorResource(c *gin.Context){
+func AddAlertingMetric(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorResource
+	var m models.AlertingMetric
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := monitor.AddMonitorResource(&m)
+	_, err := alarm.AddAlertingMetric(&m)
 	if err != nil {
-		log.Errorf("Add monitor resource error %s",err.Error())
+		log.Errorf("Add alarm metric error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddMonitorResource(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMonitorResource(c *gin.Context){
+func UpdateAlertingMetric(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorResource
+	var m models.AlertingMetric
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := monitor.UpdateMonitorResource(&m)
+	err := alarm.UpdateAlertingMetric(&m)
 	if err != nil {
-		log.Errorf("Update monitor resource id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update alarm metric id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteMonitorResource(c *gin.Context){
+func DeleteAlertingMetric(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,18 +54,19 @@ func DeleteMonitorResource(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = monitor.DeleteMonitorResource(id)
+	_, err = alarm.DeleteAlertingMetric(id)
 	if err != nil {
-		log.Errorf("Delete monitor resource id=%d error %s", id, err.Error())
+		log.Errorf("Delete alarm metric id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetMonitorResourceList(c *gin.Context){
+func GetAlertingMetricList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := monitor.GetMonitorResourceList()
+	exporter := c.Query("exporter")
+	data, err := alarm.GetAlertingMetricList(exporter)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -74,7 +75,7 @@ func GetMonitorResourceList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetMonitorResourcePage(c *gin.Context){
+func GetAlertingMetricPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -98,7 +99,7 @@ func GetMonitorResourcePage(c *gin.Context){
 	}
 	exporter := c.Query("exporter")
 	keywords := c.Query("keywords")
-	data, err := monitor.GetMonitorResourcePage(pageIndex, pageSize, exporter, keywords)
+	data, err := alarm.GetAlertingMetricPage(pageIndex, pageSize, exporter, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

@@ -10,18 +10,18 @@ import (
 	"strconv"
 )
 
-func AddMonitorResource(c *gin.Context){
+func AddExporter(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorResource
+	var m models.Exporter
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := monitor.AddMonitorResource(&m)
+	_, err := monitor.AddExporter(&m)
 	if err != nil {
-		log.Errorf("Add monitor resource error %s",err.Error())
+		log.Errorf("Add exporter error %s",err.Error())
 		resp.ToError(c, err)
 		return
 	}
@@ -29,24 +29,24 @@ func AddMonitorResource(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func UpdateMonitorResource(c *gin.Context){
+func UpdateExporter(c *gin.Context){
 	var resp utils.Response
-	var m models.MonitorResource
+	var m models.Exporter
 	if err := c.ShouldBindJSON(&m);err != nil{
 		resp.ToError(c, err)
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := monitor.UpdateMonitorResource(&m)
+	err := monitor.UpdateExporter(&m)
 	if err != nil {
-		log.Errorf("Update monitor resource id=%d error %s", m.Id, err.Error())
+		log.Errorf("Update exporter id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func DeleteMonitorResource(c *gin.Context){
+func DeleteExporter(c *gin.Context){
 	var resp utils.Response
 	obj := c.Param("id")
 	id, err := strconv.Atoi(obj)
@@ -54,18 +54,18 @@ func DeleteMonitorResource(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = monitor.DeleteMonitorResource(id)
+	_, err = monitor.DeleteExporter(id)
 	if err != nil {
-		log.Errorf("Delete monitor resource id=%d error %s", id, err.Error())
+		log.Errorf("Delete exporter id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}
 	resp.ToSuccess(c)
 }
 
-func GetMonitorResourceList(c *gin.Context){
+func GetExporterList(c *gin.Context){
 	resp := &utils.Response{}
-	data, err := monitor.GetMonitorResourceList()
+	data, err := monitor.GetExporterList()
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -74,7 +74,7 @@ func GetMonitorResourceList(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
-func GetMonitorResourcePage(c *gin.Context){
+func GetExporterPage(c *gin.Context){
 	resp := &utils.Response{}
 	obj, isExist := c.GetQuery("pageIndex")
 	if isExist != true {
@@ -96,9 +96,8 @@ func GetMonitorResourcePage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
-	exporter := c.Query("exporter")
 	keywords := c.Query("keywords")
-	data, err := monitor.GetMonitorResourcePage(pageIndex, pageSize, exporter, keywords)
+	data, err := monitor.GetExporterPage(pageIndex, pageSize, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

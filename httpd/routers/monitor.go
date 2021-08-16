@@ -15,6 +15,13 @@ func MonitorRoutes(route *gin.Engine) {
 		user.GET("/prometheus/list", monitor.GetPrometheusList)
 		user.GET("/prometheus/page", monitor.GetPrometheusPage)
 
+		// exporter
+		user.POST("/exporter", monitor.AddExporter)
+		user.PUT("/exporter/:id", monitor.UpdateExporter)
+		user.DELETE("/exporter/:id", monitor.DeleteExporter)
+		user.GET("/exporter/list", monitor.GetExporterList)
+		user.GET("/exporter/page", monitor.GetExporterPage)
+
 		// monitor resource
 		user.POST("/resource", monitor.AddMonitorResource)
 		user.PUT("/resource/:id", monitor.UpdateMonitorResource)

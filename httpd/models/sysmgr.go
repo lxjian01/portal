@@ -12,14 +12,14 @@ type Menu struct {
 
 type User struct {
 	BaseModel
-	UserCode   string `gorm:"column:user_code;type:varchar(64);uniqueIndex" json:"userCode" form:"userCode" binding:"required"`
+	UserCode   string `gorm:"column:user_code;type:varchar(64)" json:"userCode" form:"userCode" binding:"required"`
 	UserName   string `gorm:"column:user_name;type:varchar(64)" json:"userName" form:"userName" binding:"required"`
 	Roles  []string          `gorm:"-" json:"roles" form:"roles" binding:""`
 }
 
 type Role struct {
 	BaseModel
-	RoleCode   string `gorm:"column:role_code;type:varchar(64);uniqueIndex" json:"roleCode" form:"roleCode" binding:"required"`
+	RoleCode   string `gorm:"column:role_code;type:varchar(64)" json:"roleCode" form:"roleCode" binding:"required"`
 	RoleName   string `gorm:"column:role_name;type:varchar(64)" json:"roleName" form:"roleName" binding:"required"`
 }
 
