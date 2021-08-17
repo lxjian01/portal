@@ -10,6 +10,7 @@ type Prometheus struct {
 
 type PrometheusList struct {
 	Id int `gorm:"column:id" json:"id"`
+	Code   string `gorm:"column:code" json:"code"`
 	Name   string `gorm:"column:name" json:"name"`
 }
 
@@ -34,6 +35,7 @@ type MonitorResource struct {
 
 type MonitorResourceList struct {
 	Id int `gorm:"column:id" json:"id"`
+	Code   string `gorm:"column:code" json:"code"`
 	Name   string `gorm:"column:name" json:"name"`
 }
 

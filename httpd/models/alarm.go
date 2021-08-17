@@ -112,28 +112,40 @@ type PrometheusAlertingRule struct {
 }
 
 type AlarmNotice struct {
-	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id" form:"id" binding:""`
-	PrometheusCode   string `gorm:"column:prometheus_code;type:varchar(64)" json:"prometheusCode" form:"prometheusCode" binding:"required"`
-	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
-	Resource   string `gorm:"column:exporter;type:varchar(64)" json:"resource" form:"resource" binding:"required"`
-	Fingerprint   string `gorm:"column:fingerprint;type:varchar(64)" json:"fingerprint" form:"fingerprint" binding:"required"`
-	AlertName   string `gorm:"column:alert_name;type:varchar(64)" json:"alert_name" form:"alert_name" binding:"required"`
-	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
-	AlarmNumber   string `gorm:"column:alarm_number;type:int" json:"alarmNumber" form:"alarmNumber" binding:"required"`
+	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id"`
+	PrometheusCode   string `gorm:"column:prometheus_code;type:varchar(64)" json:"prometheusCode"`
+	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter"`
+	MonitorResourceCode   string `gorm:"column:monitor_resource_code;type:varchar(64)" json:"monitorResourceCode"`
+	Fingerprint   string `gorm:"column:fingerprint;type:varchar(64)" json:"fingerprint"`
+	AlertName   string `gorm:"column:alert_name;type:varchar(128)" json:"alertName"`
+	Instance   string `gorm:"column:instance;type:varchar(64)" json:"instance"`
+	Summary   string `gorm:"column:summary;type:varchar(128)" json:"summary"`
+	Description   string `gorm:"column:description;type:varchar(256)" json:"description"`
+	Status   string `gorm:"column:status;type:varchar(16)" json:"status"`
+	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity"`
+	StartAt MyTime `gorm:"column:start_at;type:datetime" json:"startAt"`
+	EndAt MyTime `gorm:"column:end_at;type:datetime" json:"endAt"`
+	AlarmNumber   int `gorm:"column:alarm_number;type:int" json:"alarmNumber"`
 	CreateTime MyTime `gorm:"column:create_time;type:datetime;autoCreateTime" json:"createTime"`
 	UpdateTime MyTime `gorm:"column:update_time;type:datetime;autoUpdateTime" json:"updateTime"`
 }
 
+type AlarmNoticePage struct {
+	AlarmNotice
+	PrometheusName   string `gorm:"column:prometheus_name" json:"prometheusName"`
+	MonitorResourceName   string `gorm:"column:monitor_resource_name" json:"monitorResourceName"`
+}
+
 type Alert struct {
 	Status string `json:"status"`
-	Labels map[string]interface{} `json:"labels"`
+	Labels map[string]string `json:"labels"`
 	Annotations map[string]string `json:"annotations"`
 	Fingerprint string `json:"fingerprint"`
 	StartsAt time.Time `json:"startsAt"`
 	EndsAt time.Time `json:"endsAt"`
 }
 
-type Notice struct {
+type AlertManagerNotice struct {
 	Version string `json:"version"`
 	GroupKey string `json:"groupkey"`
 	Status string `json:"status"`
