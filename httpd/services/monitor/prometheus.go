@@ -55,7 +55,7 @@ func DeletePrometheus(id int) (int64, error) {
 
 func GetPrometheusList() (*[]models.PrometheusList, error) {
 	dataList := make([]models.PrometheusList, 0)
-	err := myorm.GetOrmDB().Table("prometheus").Select("id","name").Find(&dataList).Error
+	err := myorm.GetOrmDB().Table("prometheus").Select("id","code","name").Find(&dataList).Error
 	return &dataList, err
 }
 

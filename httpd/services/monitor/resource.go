@@ -26,7 +26,7 @@ func DeleteMonitorResource(id int) (int64, error) {
 
 func GetMonitorResourceList() (*[]models.MonitorResourceList, error) {
 	dataList := make([]models.MonitorResourceList, 0)
-	myorm.GetOrmDB().Table("monitor_resource").Select("id","name").Find(&dataList)
+	myorm.GetOrmDB().Table("monitor_resource").Select("id","code","name").Find(&dataList)
 	return &dataList, nil
 }
 
