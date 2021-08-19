@@ -186,10 +186,15 @@ type prometheusRecordingRuleList struct {
 	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
 }
 
-func GetRecordingRulePage(pageIndex int, pageSize int, keywords string) (*utils.PageData, error) {
+func GetRecordingRulePage(pageIndex int, pageSize int, prometheusId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.RecordingRulePage, 0)
 	tx := myorm.GetOrmDB().Table("recording_rule")
 	tx.Select("recording_rule.id","recording_rule.name","recording_rule.record","recording_rule.expr","recording_rule.update_user","recording_rule.update_time")
+	if prometheusId != 0 {
+		tx.Joins("left join prometheus_recording_rule on prometheus_recording_rule.recording_rule_id = recording_rule.id")
+		tx.Joins("left join prometheus on prometheus.id = prometheus_recording_rule.prometheus_id")
+		tx.Where("prometheus.id = ?", prometheusId)
+	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
 		tx.Where("recording_rule.name like ? or recording_rule.record like ? or recording_rule.expr like ?", likeStr, likeStr, likeStr)
@@ -198,7 +203,6 @@ func GetRecordingRulePage(pageIndex int, pageSize int, keywords string) (*utils.
 	if err != nil {
 		return nil, err
 	}
-
 	recordings := make([]prometheusRecordingRuleList, 0)
 	myorm.GetOrmDB().Table("prometheus_recording_rule").Select("prometheus_recording_rule.recording_rule_id", "prometheus_recording_rule.prometheus_id","prometheus.code as prometheus_code","prometheus.name as prometheus_name").Joins("left join prometheus on prometheus_recording_rule.prometheus_id = prometheus.id").Find(&recordings)
 	for index, item := range dataList {
@@ -209,7 +213,6 @@ func GetRecordingRulePage(pageIndex int, pageSize int, keywords string) (*utils.
 			}
 		}
 	}
-
 	pageData.Data = &dataList
 	return pageData, nil
 }

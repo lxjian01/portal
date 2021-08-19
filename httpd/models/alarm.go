@@ -76,7 +76,7 @@ type AlertingMetric struct {
 
 type AlertingMetricList struct {
 	Id int `gorm:"column:id" json:"id"`
-	summary   string `gorm:"column:name" json:"name"`
+	Summary   string `gorm:"column:summary" json:"summary"`
 }
 
 type AlertingRule struct {

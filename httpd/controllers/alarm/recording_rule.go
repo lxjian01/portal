@@ -85,8 +85,14 @@ func GetRecordingRulePage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
+	obj = c.DefaultQuery("prometheusId", "0")
+	prometheusId, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数prometheusId必须是整数")
+		return
+	}
 	keywords := c.Query("keywords")
-	data, err := alarm.GetRecordingRulePage(pageIndex, pageSize, keywords)
+	data, err := alarm.GetRecordingRulePage(pageIndex, pageSize, prometheusId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
