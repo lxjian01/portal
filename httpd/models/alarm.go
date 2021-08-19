@@ -68,7 +68,6 @@ type AlertingMetric struct {
 	BaseModel
 	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter" form:"exporter" binding:"required"`
 	Code   string `gorm:"column:code;type:varchar(64)" json:"code" form:"code" binding:"required"`
-	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Metric   string `gorm:"column:metric;type:varchar(256)" json:"metric" form:"metric" binding:"required"`
 	Summary   string `gorm:"column:summary;type:varchar(128)" json:"summary" form:"summary" binding:"required"`
 	Description   string `gorm:"column:description;type:varchar(256)" json:"description" form:"description" binding:"required"`
@@ -77,7 +76,7 @@ type AlertingMetric struct {
 
 type AlertingMetricList struct {
 	Id int `gorm:"column:id" json:"id"`
-	Name   string `gorm:"column:name" json:"name"`
+	summary   string `gorm:"column:name" json:"name"`
 }
 
 type AlertingRule struct {

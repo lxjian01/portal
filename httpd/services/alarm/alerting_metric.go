@@ -15,7 +15,7 @@ func AddAlertingMetric(m *models.AlertingMetric) (int, error) {
 }
 
 func UpdateAlertingMetric(m *models.AlertingMetric) error {
-	result := myorm.GetOrmDB().Table("alerting_metric").Select("exporter","code","name","metric","summary","description","remark").Where("id = ?", m.Id).Updates(m)
+	result := myorm.GetOrmDB().Table("alerting_metric").Select("exporter","code","metric","summary","description","remark").Where("id = ?", m.Id).Updates(m)
 	return result.Error
 }
 
@@ -26,7 +26,7 @@ func DeleteAlertingMetric(id int) (int64, error) {
 
 func GetAlertingMetricList(exporter string) (*[]models.AlertingMetricList, error) {
 	dataList := make([]models.AlertingMetricList, 0)
-	tx := myorm.GetOrmDB().Table("alerting_metric").Select("id","name")
+	tx := myorm.GetOrmDB().Table("alerting_metric").Select("id","summary")
 	if exporter != "" {
 		tx.Where("exporter = ?", exporter)
 	}
@@ -37,13 +37,13 @@ func GetAlertingMetricList(exporter string) (*[]models.AlertingMetricList, error
 func GetAlertingMetricPage(pageIndex int, pageSize int, exporter, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.AlertingMetric, 0)
 	tx := myorm.GetOrmDB().Table("alerting_metric")
-	tx.Select("id","exporter","code","name","metric","summary","description","remark","update_user","update_time")
+	tx.Select("id","exporter","code","metric","summary","description","remark","update_user","update_time")
 	if exporter != "" {
 		tx.Where("exporter = ?", exporter)
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("code like ? or name like ?", likeStr, likeStr)
+		tx.Where("code like ? or summary like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {
