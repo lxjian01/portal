@@ -24,6 +24,12 @@ func DeleteAlertingMetric(id int) (int64, error) {
 	return result.RowsAffected, result.Error
 }
 
+func GetAlertingMetricDetail(id int) (*models.AlertingMetric, error) {
+	var m models.AlertingMetric
+	myorm.GetOrmDB().Table("alerting_metric").Where("id = ?", id).First(&m)
+	return &m, nil
+}
+
 func GetAlertingMetricList(exporter string) (*[]models.AlertingMetricList, error) {
 	dataList := make([]models.AlertingMetricList, 0)
 	tx := myorm.GetOrmDB().Table("alerting_metric").Select("id","summary")

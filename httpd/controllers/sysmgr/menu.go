@@ -73,7 +73,7 @@ func GetMenuDetail(c *gin.Context){
 	}
 	data, err := sysmgr.GetMenuDetail(id)
 	if err != nil {
-		log.Errorf("Get system menu id=%d error %s", id, err.Error())
+		log.Errorf("Get system menu detail id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
 		return
 	}

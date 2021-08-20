@@ -97,7 +97,6 @@ type AlertingRulePage struct {
 	AlertingRule
 	Exporter   string `gorm:"column:exporter" json:"exporter"`
 	Code   string `gorm:"column:code" json:"code" form:"code"`
-	Name   string `gorm:"column:name" json:"name" form:"name"`
 	Metric   string `gorm:"column:metric" json:"metric"`
 	Summary   string `gorm:"column:summary" json:"summary"`
 	Description   string `gorm:"column:description" json:"description"`

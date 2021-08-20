@@ -63,6 +63,24 @@ func DeleteAlertingMetric(c *gin.Context){
 	resp.ToSuccess(c)
 }
 
+func GetAlertingMetricDetail(c *gin.Context){
+	resp := &utils.Response{}
+	obj := c.Param("id")
+	id, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数id必须是整数")
+		return
+	}
+	data, err := alarm.GetAlertingMetricDetail(id)
+	if err != nil {
+		log.Errorf("Get alerting metric detail id=%d error %s", id, err.Error())
+		resp.ToError(c, err)
+		return
+	}
+	resp.Data = data
+	resp.ToSuccess(c)
+}
+
 func GetAlertingMetricList(c *gin.Context){
 	resp := &utils.Response{}
 	exporter := c.Query("exporter")

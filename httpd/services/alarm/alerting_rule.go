@@ -13,10 +13,15 @@ type prometheusAlertingRuleList struct {
 	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
 }
 
-func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, alertingMetricId int, keywords string) (*utils.PageData, error) {
+func GetAlertingRulePage(pageIndex int, pageSize int, prometheusId int, exporter string, alertingMetricId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.AlertingRulePage, 0)
 	tx := myorm.GetOrmDB().Table("alerting_rule")
-	tx.Select("alerting_rule.id","alerting_rule.alerting_metric_id","alerting_rule.operator","alerting_rule.threshold_value","alerting_rule.alerting_for","alerting_rule.severity","alerting_rule.update_user","alerting_rule.update_time","alerting_metric.exporter","alerting_metric.code","alerting_metric.name","alerting_metric.metric","alerting_metric.summary","alerting_metric.description")
+	tx.Select("alerting_rule.id","alerting_rule.alerting_metric_id","alerting_rule.operator","alerting_rule.threshold_value","alerting_rule.alerting_for","alerting_rule.severity","alerting_rule.update_user","alerting_rule.update_time","alerting_metric.exporter","alerting_metric.code","alerting_metric.metric","alerting_metric.summary","alerting_metric.description")
+	if prometheusId != 0 {
+		tx.Joins("left join prometheus_alerting_rule on prometheus_alerting_rule.alerting_rule_id = alerting_rule.id")
+		tx.Joins("left join prometheus on prometheus.id = prometheus_alerting_rule.prometheus_id")
+		tx.Where("prometheus.id = ?", prometheusId)
+	}
 	tx.Joins("left join alerting_metric on alerting_metric.id = alerting_rule.alerting_metric_id")
 	if exporter != "" {
 		tx.Where("alerting_metric.exporter = ?", exporter)
@@ -26,7 +31,7 @@ func GetAlertingRulePage(pageIndex int, pageSize int, exporter string, alertingM
 	}
 	if keywords != "" {
 		likeStr := "%" + keywords + "%"
-		tx.Where("alerting_metric.code like ? or alerting_metric.name like ?", likeStr, likeStr)
+		tx.Where("alerting_metric.code like ? or alerting_metric.summary like ?", likeStr, likeStr)
 	}
 	pageData, err := utils.GetPageData(tx, pageIndex, pageSize, &dataList)
 	if err != nil {

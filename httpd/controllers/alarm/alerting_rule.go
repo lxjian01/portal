@@ -29,6 +29,12 @@ func GetAlertingRulePage(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数pageSize必须是整数")
 		return
 	}
+	obj = c.DefaultQuery("prometheusId", "0")
+	prometheusId, err := strconv.Atoi(obj)
+	if err != nil {
+		resp.ToMsgBadRequest(c, "参数prometheusId必须是整数")
+		return
+	}
 	exporter := c.Query("exporter")
 	obj = c.DefaultQuery("alertingMetricId", "0")
 	alertingMetricId, err := strconv.Atoi(obj)
@@ -37,7 +43,7 @@ func GetAlertingRulePage(c *gin.Context){
 		return
 	}
 	keywords := c.Query("keywords")
-	data, err := alarm.GetAlertingRulePage(pageIndex, pageSize, exporter, alertingMetricId, keywords)
+	data, err := alarm.GetAlertingRulePage(pageIndex, pageSize, prometheusId, exporter, alertingMetricId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
