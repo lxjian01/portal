@@ -38,6 +38,9 @@ func AlarmRoutes(route *gin.Engine) {
 		user.GET("/alerting/metric/page", alarm.GetAlertingMetricPage)
 
 		// alarm alerting rule
+		user.POST("/alerting/rule", alarm.AddAlertingRule)
+		user.PUT("/alerting/rule/:id", alarm.UpdateAlertingRule)
+		user.DELETE("/alerting/rule/:id", alarm.DeleteAlertingRule)
 		user.GET("/alerting/rule/page", alarm.GetAlertingRulePage)
 
 		// alarm page

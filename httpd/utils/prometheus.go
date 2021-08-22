@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/alecthomas/template"
+	"github.com/hashicorp/consul/api"
 	"net/http"
+	"portal/global/consul"
 )
 
 func PrometheusReload(url string) error {
@@ -21,16 +23,14 @@ func PrometheusReload(url string) error {
 	return nil
 }
 
-const ruleTemplate = `  - alert: '{{ Key . }}'
+const AlertingRuleTemplate = `  - alert: '{{ .Alert }}'
     expr: {{.Expr}}
     for: {{.For}}
     labels:
       severity: {{.Severity}}
     annotations:
       summary: '{{.Summary}}'
-      description: '{{.Description}}'l
-      group: '{{.Group}}'
-      value: {{"'{{$value}}'"}}
+      description: '{{.Description}}'
 `
 
 const RecordingRuleTemplate = `  - record: {{ .Record }}
@@ -40,6 +40,15 @@ const RecordingRuleTemplate = `  - record: {{ .Record }}
 type RecordingRule struct {
 	Record  string        `json:"record"`
 	Expr    string        `json:"expr"`
+}
+
+type AlertingRule struct {
+	Alert     string `json:"alert"`
+	Expr  string `json:"expr"`
+	For  string `json:"for"`
+	Severity    string `json:"severity"`
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
 }
 
 func GetRecordingRuleTemplate(rule *RecordingRule) (string, error) {
@@ -56,84 +65,9 @@ func GetRecordingRuleTemplate(rule *RecordingRule) (string, error) {
 	return b.String(), nil
 }
 
-type APIRule struct {
-	Id     string `json:"id" bson:"_id" yaml:"id"`
-	IdStr  string        `json:"id_str" yaml:"id_str"`
-	Group  string        `json:"group" yaml:"group"`
-	Record string        `json:"record" yaml:"record"`
-	// Alert          string              `json:"alert"`
-	Metric   string `json:"metric" yaml:"metric"`
-	Expr     string `json:"expr" yaml:"expr"`
-	For      string `json:"for" yaml:"for"`
-	Severity string `json:"severity" yaml:"severity"`
-	Description     string `json:"description" yaml:"description"`
-	Summary  string `json:"summary" yaml:"summary"`
-	// Object         string              `json:"object" yaml:"object"`
-	// Left           string                 `json:"left" yaml:"left"`
-	Right          string                 `json:"right" yaml:"right"`
-	Operator       string                 `json:"operator" yaml:"operator"`
-	Repeat         bool                   `json:"repeat" yaml:"repeat"`
-	RepeatInterval string                 `json:"repeatInterval" yaml:"repeat_interval"`
-	TagValues      []map[string]string    `json:"tagValues" yaml:"tag_values"`
-	EnvType        string                 `json:"env_type" yaml:"env_type"`
-	Envs           []string               `json:"envs" yaml:"envs"`
-	Start          string                 `json:"start" yaml:"start"`
-	End            string                 `json:"end" yaml:"end"`
-	Disable        bool                   `json:"disable" yaml:"disable"`
-	UnixTime       int64                  `json:"unix_time" yaml:"unix_time" bson:"unix_time"`
-	SendResolve    bool                   `json:"send_resolve" yaml:"send_resolve" bson:"send_resolve"`
-	Extra          map[string]interface{} `json:"extra" yaml:"extra"`
-	AlertGroupIDs  []string               `json:"alert_group_ids" yaml:"alert_group_ids" bson:"alert_group_ids"`
-	AlertGroups    []AlertGroup           `json:"alert_groups" yaml:"alert_groups" bson:"-"`
-	CreateTime     string                 `json:"create_time" yaml:"create_time" bson:"create_time"`
-	UpdateTime     string                 `json:"update_time" yaml:"update_time" bson:"update_time"`
-	ResolveTimeout string                 `json:"resolve_timeout" yaml:"resolve_timeout" bson:"resolve_timeout"`
-}
-
-func (a *APIRule) GetKey() string {
-	return a.Id + "_" + a.Metric
-}
-
-
-
-// AlertGroup 告警组
-type AlertGroup struct {
-	ID         string          `json:"id" bson:"_id" yaml:"id"`
-	Name       string                 `json:"name" yaml:"name"`
-	UserIDS    []string               `json:"user_ids" yaml:"user_ids" bson:"user_ids"`
-	Users      []AlertUser            `json:"users" yaml:"users" bson:"-"`
-	Extra      map[string]interface{} `json:"extra" yaml:"extra"`
-	Preview    map[string]string      `json:"preview" yaml:"preview" bson:"-"`
-	CreateTime string                 `json:"create_time" yaml:"create_time" bson:"create_time"`
-	UpdateTime string                 `json:"update_time" yaml:"update_time" bson:"update_time"`
-}
-
-// AlertUser 告警联系人
-type AlertUser struct {
-	ID           string          `json:"id" bson:"_id" yaml:"id"`
-	Name         string                 `json:"name" yaml:"name"`
-	MailEnable   bool                   `json:"mail_enable" yaml:"mail_enable" bson:"mail_enable"`
-	Mail         string                 `json:"mail" yaml:"mail"`
-	WechatEnable bool                   `json:"wechat_enable" yaml:"wechat_enable" bson:"wechat_enable"`
-	Wechat       string                 `json:"wechat" yaml:"wechat"`
-	WechatType   string                 `json:"wechat_type" yaml:"wechat_type"`
-	SmsEnable    bool                   `json:"sms_enable" yaml:"sms_enable" bson:"sms_enable"`
-	Mobile       string                 `json:"mobile" yaml:"mobile"`
-	Extra        map[string]interface{} `json:"extra" yaml:"extra"`
-	CreateTime   string                 `json:"create_time" yaml:"create_time" bson:"create_time"`
-	UpdateTime   string                 `json:"update_time" yaml:"update_time" bson:"update_time"`
-}
-
-func getRuleTemplate(rule *APIRule) (string, error) {
-	t := template.New("rule").Funcs(template.FuncMap{
-		"Key": func(rule APIRule) string {
-			return rule.GetKey()
-		},
-		// "Object": func(rule apptypes.APIRule) string {
-		// 	return objectCache[rule.Object].Template
-		// },
-	})
-	t, err := t.Parse(ruleTemplate)
+func GetAlertingRuleTemplate(rule *AlertingRule) (string, error) {
+	t := template.New("alerting_rule")
+	t, err := t.Parse(AlertingRuleTemplate)
 	if err != nil {
 		return "", err
 	}
@@ -143,4 +77,15 @@ func getRuleTemplate(rule *APIRule) (string, error) {
 		return "", err
 	}
 	return b.String(), nil
+}
+
+func PutConsul(key string, value string) error {
+	client := consul.GetClient()
+	kv := client.KV()
+	p := &api.KVPair{Key: key, Value: []byte(value)}
+	_, err := kv.Put(p, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }

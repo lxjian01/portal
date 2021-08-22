@@ -3,7 +3,6 @@ package alarm
 import (
 	"errors"
 	"fmt"
-	"github.com/hashicorp/consul/api"
 	"gorm.io/gorm"
 	"portal/global/consul"
 	"portal/global/log"
@@ -11,17 +10,6 @@ import (
 	"portal/httpd/models"
 	"portal/httpd/utils"
 )
-
-func put(key string, value string) error {
-	client := consul.GetClient()
-	kv := client.KV()
-	p := &api.KVPair{Key: key, Value: []byte(value)}
-	_, err := kv.Put(p, nil)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func AddRecordingRule(m *models.RecordingRuleAdd) (int, error) {
 	err := myorm.GetOrmDB().Transaction(func(tx *gorm.DB) error {
@@ -60,11 +48,11 @@ func AddRecordingRule(m *models.RecordingRuleAdd) (int, error) {
 			return err
 		}
 		for _, item := range prometheusList {
-			code := item.Code
-			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
-			consulErr := put(key,template)
+			prometheusCode := item.Code
+			key := fmt.Sprintf("prometheus/%s/rule/recordings/%s", prometheusCode, m.Record)
+			consulErr := utils.PutConsul(key,template)
 			if consulErr != nil {
-				log.Errorf("Put prometheus %s rule recording error by %s", code, consulErr)
+				log.Errorf("Put prometheus %s recording rule error by %s", prometheusCode, consulErr)
 			}
 		}
 		return err
@@ -81,7 +69,7 @@ func UpdateRecordingRule(m *models.RecordingRuleAdd) error {
 			return err
 		}
 		// update recording rule
-		err = tx.Table("recording_rule").Select("prometheus_id","name","expr").Where("id = ?", m.Id).Updates(m).Error
+		err = tx.Table("recording_rule").Select("name","expr").Where("id = ?", m.Id).Updates(m).Error
 		if err != nil {
 			return err
 		}
@@ -113,12 +101,12 @@ func UpdateRecordingRule(m *models.RecordingRuleAdd) error {
 		}
 		// delete consul Key/Value
 		for _, item := range oldPrometheusList {
-			code := item.PrometheusCode
-			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
+			prometheusCode := item.PrometheusCode
+			key := fmt.Sprintf("prometheus/%s/rule/recordings/%s", prometheusCode, m.Record)
 			client := consul.GetClient()
 			_, consulErr := client.KV().Delete(key, nil)
 			if consulErr != nil {
-				log.Errorf("Delete prometheus %s rule recording error by %s", code, consulErr)
+				log.Errorf("Delete prometheus %s recording rule error by %s", prometheusCode, consulErr)
 			}
 		}
 		// registry consul Key/Value
@@ -130,11 +118,11 @@ func UpdateRecordingRule(m *models.RecordingRuleAdd) error {
 			return err
 		}
 		for _, item := range prometheusList {
-			code := item.Code
-			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, m.Record)
-			consulErr := put(key,template)
+			prometheusCode := item.Code
+			key := fmt.Sprintf("prometheus/%s/rule/recordings/%s", prometheusCode, m.Record)
+			consulErr := utils.PutConsul(key,template)
 			if consulErr != nil {
-				log.Errorf("Put prometheus %s rule recording error by %s", code, consulErr)
+				log.Errorf("Put prometheus %s recording rule error by %s", prometheusCode, consulErr)
 			}
 		}
 		return err
@@ -159,19 +147,19 @@ func DeleteRecordingRule(id int) error {
 		// delete recording rule
 		recordingRule := models.RecordingRule{}
 		tx.Table("recording_rule").Where("id = ?", id).Find(&recordingRule)
-		err = tx.Table("recording_rule").Where("id = ?", id).Delete(&models.Prometheus{}).Error
+		err = tx.Table("recording_rule").Where("id = ?", id).Delete(&models.RecordingRule{}).Error
 		if err != nil {
 			return err
 		}
 
 		// delete consul Key/Value
 		for _, item := range prometheusList {
-			code := item.PrometheusCode
-			key := fmt.Sprintf("prometheus/%s/rules/recordings/%s", code, recordingRule.Record)
+			prometheusCode := item.PrometheusCode
+			key := fmt.Sprintf("prometheus/%s/rule/recordings/%s", prometheusCode, recordingRule.Record)
 			client := consul.GetClient()
 			_, consulErr := client.KV().Delete(key, nil)
 			if consulErr != nil {
-				log.Errorf("Delete prometheus %s rule recording error by %s", code, consulErr)
+				log.Errorf("Delete prometheus %s recording rule error by %s", prometheusCode, consulErr)
 			}
 		}
 		return err

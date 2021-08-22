@@ -81,9 +81,9 @@ type AlertingMetricList struct {
 
 type AlertingRule struct {
 	BaseModel
-	AlertingMetricId   string `gorm:"column:alerting_metric_id;type:varchar(64)" json:"alertingMetricId" form:"alertingMetricId" binding:"required"`
+	AlertingMetricId   int `gorm:"column:alerting_metric_id;type:int" json:"alertingMetricId" form:"alertingMetricId" binding:"required"`
 	Operator   string `gorm:"column:operator;type:varchar(16)" json:"operator" form:"operator" binding:"required"`
-	ThresholdValue   string `gorm:"column:threshold_value;type:int" json:"thresholdValue" form:"thresholdValue" binding:"required"`
+	ThresholdValue   int `gorm:"column:threshold_value;type:int" json:"thresholdValue" form:"thresholdValue" binding:"required"`
 	AlertingFor   string `gorm:"column:alerting_for;type:varchar(16)" json:"alertingFor" form:"alertingFor" binding:"required"`
 	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
 }
