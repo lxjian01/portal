@@ -45,7 +45,7 @@ type MonitorTarget struct {
 	MonitorResourceId   int `gorm:"column:monitor_resource_id;type:int" json:"monitorResourceId" form:"monitorResourceId" binding:"required"`
 	Name   string `gorm:"column:name;type:varchar(64)" json:"name" form:"name" binding:"required"`
 	Url   string `gorm:"column:url;type:varchar(128)" json:"url" form:"url" binding:""`
-	Interval   string `gorm:"column:interval;type:varchar(32)" json:"interval" form:"interval" binding:"required"`
+	ScrapeInterval   string `gorm:"column:scrape_interval;type:varchar(16)" json:"scrapeInterval" form:"scrapeInterval" binding:"required"`
 	Remark   string `gorm:"column:remark;type:varchar(512)" json:"remark" form:"remark" binding:""`
 }
 

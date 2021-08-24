@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"errors"
+	"fmt"
 	consulapi "github.com/hashicorp/consul/api"
 	"gorm.io/gorm"
 	"portal/global/consul"
@@ -50,9 +51,10 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// registry consul service
 		tags := make([]string, 0)
-		tags = append(tags, prometheus.Code)
-		tags = append(tags, monitorResource.Exporter)
+		prometheusCodeTag := fmt.Sprintf("%s-%s", prometheus.Code, m.ScrapeInterval)
+		tags = append(tags, prometheusCodeTag)
 		meta := make(map[string]string, 0)
+		meta["exporter"] = monitorResource.Exporter
 		meta["resource"] = monitorResource.Code
 		client := consul.GetClient()
 		ip := strings.Split(m.Url,"/")[2]
@@ -64,7 +66,7 @@ func AddMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		check := consulapi.AgentServiceCheck{
 			HTTP:     m.Url,
-			Interval: m.Interval,
+			Interval: m.ScrapeInterval,
 		}
 		serviceId := strconv.Itoa(m.Id)
 		registration := consulapi.AgentServiceRegistration{
@@ -128,9 +130,10 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		// registry consul service
 		tags := make([]string, 0)
-		tags = append(tags, prometheus.Code)
-		tags = append(tags, monitorResource.Exporter)
+		prometheusCodeTag := fmt.Sprintf("%s-%s", prometheus.Code, m.ScrapeInterval)
+		tags = append(tags, prometheusCodeTag)
 		meta := make(map[string]string, 0)
+		meta["exporter"] = monitorResource.Exporter
 		meta["resource"] = monitorResource.Code
 		client := consul.GetClient()
 		ip := strings.Split(m.Url,"/")[2]
@@ -142,7 +145,7 @@ func UpdateMonitorTarget(m *models.MonitorTargetAdd) (int, error) {
 		}
 		check := consulapi.AgentServiceCheck{
 			HTTP:     m.Url,
-			Interval: m.Interval,
+			Interval: m.ScrapeInterval,
 		}
 		serviceId := strconv.Itoa(m.Id)
 		registration := consulapi.AgentServiceRegistration{
@@ -210,7 +213,7 @@ type alarmGroupList struct {
 func GetMonitorTargetPage(pageIndex int, pageSize int, prometheusId int, monitorResourceId int, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.MonitorTargetPage, 0)
 	tx := myorm.GetOrmDB().Table("monitor_target")
-	tx.Select("monitor_target.id","monitor_target.prometheus_id","monitor_target.monitor_resource_id","monitor_target.name","monitor_target.url","monitor_target.interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","prometheus.code as prometheus_code","prometheus.name as prometheus_name","prometheus.url as prometheus_url","monitor_resource.code as monitor_resource_code","monitor_resource.name as monitor_resource_name","monitor_resource.exporter")
+	tx.Select("monitor_target.id","monitor_target.prometheus_id","monitor_target.monitor_resource_id","monitor_target.name","monitor_target.url","monitor_target.scrape_interval","monitor_target.remark","monitor_target.create_user","monitor_target.create_time","monitor_target.update_user","monitor_target.update_time","prometheus.code as prometheus_code","prometheus.name as prometheus_name","prometheus.url as prometheus_url","monitor_resource.code as monitor_resource_code","monitor_resource.name as monitor_resource_name","monitor_resource.exporter")
 	tx.Joins("left join prometheus on prometheus.id = monitor_target.prometheus_id")
 	tx.Joins("left join monitor_resource on monitor_resource.id = monitor_target.monitor_resource_id")
 	if prometheusId != 0 {
