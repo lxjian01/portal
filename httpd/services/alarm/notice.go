@@ -23,14 +23,10 @@ func AddOrUpdateAlarmNotice(m *models.AlarmNotice) error {
 func GetAlarmNoticePage(pageIndex int, pageSize int, prometheusCode string, monitorResourceCode string, severity string, status string, keywords string) (*utils.PageData, error) {
 	dataList := make([]models.AlarmNoticePage, 0)
 	tx := myorm.GetOrmDB().Table("alarm_notice")
-	tx.Select("alarm_notice.id","alarm_notice.prometheus_code","alarm_notice.exporter","alarm_notice.monitor_resource_code","alarm_notice.alert_name","alarm_notice.instance","alarm_notice.summary","alarm_notice.description","alarm_notice.status","alarm_notice.severity","alarm_notice.start_at","alarm_notice.end_at","alarm_notice.alarm_number","alarm_notice.create_time","alarm_notice.update_time","prometheus.name as prometheus_name","monitor_resource.name as monitor_resource_name")
+	tx.Select("alarm_notice.id","alarm_notice.prometheus_code","alarm_notice.alert_name","alarm_notice.instance","alarm_notice.summary","alarm_notice.description","alarm_notice.status","alarm_notice.severity","alarm_notice.start_at","alarm_notice.end_at","alarm_notice.alarm_number","alarm_notice.labels","alarm_notice.create_time","alarm_notice.update_time","prometheus.name as prometheus_name")
 	tx.Joins("left join prometheus on prometheus.code = alarm_notice.prometheus_code")
-	tx.Joins("left join monitor_resource on monitor_resource.code = alarm_notice.monitor_resource_code")
 	if prometheusCode != "" {
 		tx.Where("alarm_notice.prometheus_code = ?", prometheusCode)
-	}
-	if monitorResourceCode != "" {
-		tx.Where("alarm_notice.monitor_resource_code = ?", monitorResourceCode)
 	}
 	if severity != "" {
 		tx.Where("alarm_notice.severity = ?", severity)

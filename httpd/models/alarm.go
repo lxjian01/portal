@@ -1,6 +1,7 @@
 package models
 
 import "time"
+import "gorm.io/datatypes"
 
 type AlarmGroup struct {
 	BaseModel
@@ -83,7 +84,7 @@ type AlertingRule struct {
 	BaseModel
 	AlertingMetricId   int `gorm:"column:alerting_metric_id;type:int" json:"alertingMetricId" form:"alertingMetricId" binding:"required"`
 	Operator   string `gorm:"column:operator;type:varchar(16)" json:"operator" form:"operator" binding:"required"`
-	ThresholdValue   int `gorm:"column:threshold_value;type:int" json:"thresholdValue" form:"thresholdValue" binding:"required"`
+	ThresholdValue   int `gorm:"column:threshold_value;type:int" json:"thresholdValue" form:"thresholdValue"`
 	AlertingFor   string `gorm:"column:alerting_for;type:varchar(16)" json:"alertingFor" form:"alertingFor" binding:"required"`
 	Severity   string `gorm:"column:severity;type:varchar(16)" json:"severity" form:"severity" binding:"required"`
 }
@@ -112,8 +113,6 @@ type PrometheusAlertingRule struct {
 type AlarmNotice struct {
 	Id        int `gorm:"column:id;type:int;primary_key;AUTO_INCREMENT" json:"id"`
 	PrometheusCode   string `gorm:"column:prometheus_code;type:varchar(64)" json:"prometheusCode"`
-	Exporter   string `gorm:"column:exporter;type:varchar(64)" json:"exporter"`
-	MonitorResourceCode   string `gorm:"column:monitor_resource_code;type:varchar(64)" json:"monitorResourceCode"`
 	Fingerprint   string `gorm:"column:fingerprint;type:varchar(64)" json:"fingerprint"`
 	AlertName   string `gorm:"column:alert_name;type:varchar(128)" json:"alertName"`
 	Instance   string `gorm:"column:instance;type:varchar(64)" json:"instance"`
@@ -124,6 +123,7 @@ type AlarmNotice struct {
 	StartAt MyTime `gorm:"column:start_at;type:datetime" json:"startAt"`
 	EndAt MyTime `gorm:"column:end_at;type:datetime" json:"endAt"`
 	AlarmNumber   int `gorm:"column:alarm_number;type:int" json:"alarmNumber"`
+	Labels   datatypes.JSON `gorm:"column:labels;type:json" json:"labels"`
 	CreateTime MyTime `gorm:"column:create_time;type:datetime;autoCreateTime" json:"createTime"`
 	UpdateTime MyTime `gorm:"column:update_time;type:datetime;autoUpdateTime" json:"updateTime"`
 }

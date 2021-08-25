@@ -48,8 +48,9 @@ func AddAlertingRule(m *models.AlertingRuleAdd) (int, error) {
 		// registry consul Key/Value
 		rule := utils.AlertingRule{}
 		rule.Alert = fmt.Sprintf("%s_%d", alertingMetric.Code, m.Id)
-		rule.Expr = fmt.Sprintf("%s%s%d", alertingMetric.Metric, m.Operator, m.ThresholdValue)
+		rule.Expr = fmt.Sprintf("%s %s %d", alertingMetric.Metric, m.Operator, m.ThresholdValue)
 		rule.For = m.AlertingFor
+		rule.Severity = m.Severity
 		rule.Summary = alertingMetric.Summary
 		rule.Description = alertingMetric.Description
 		template, err := utils.GetAlertingRuleTemplate(&rule)
@@ -117,8 +118,9 @@ func UpdateAlertingRule(m *models.AlertingRuleAdd) error {
 
 		rule := utils.AlertingRule{}
 		rule.Alert = fmt.Sprintf("%s_%d", alertingMetric.Code, m.Id)
-		rule.Expr = fmt.Sprintf("%s%s%d", alertingMetric.Metric, m.Operator, m.ThresholdValue)
+		rule.Expr = fmt.Sprintf("%s %s %d", alertingMetric.Metric, m.Operator, m.ThresholdValue)
 		rule.For = m.AlertingFor
+		rule.Severity = m.Severity
 		rule.Summary = alertingMetric.Summary
 		rule.Description = alertingMetric.Description
 		// delete consul Key/Value

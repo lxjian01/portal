@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 	"portal/httpd/models"
 	"portal/httpd/services/alarm"
 	"portal/httpd/utils"
@@ -40,11 +41,17 @@ func AddAlarmNotice(c *gin.Context){
 	}
 	var m models.AlarmNotice
 	m.PrometheusCode = notice.CommonLabels["pcode"]
-	m.Exporter = notice.CommonLabels["job"]
-	m.MonitorResourceCode = notice.CommonLabels["resource"]
 	m.Fingerprint = higAlert.Fingerprint
 	m.AlertName = notice.CommonLabels["alertname"]
 	m.Instance = notice.CommonLabels["instance"]
+	labels := make(map[string]string)
+	for key,value := range notice.CommonLabels {
+		if key != "pcode" && key != "alertname" && key != "instance" && key != "severity" {
+			labels[key] = value
+		}
+	}
+	labelsBytes,_ :=json.Marshal(labels)
+	m.Labels = datatypes.JSON(labelsBytes)
 	m.Summary = higAlert.Annotations["summary"]
 	m.Description = higAlert.Annotations["description"]
 	m.Status = higAlert.Status

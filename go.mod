@@ -19,6 +19,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	golang.org/x/sys v0.0.0-20210514084401-e8d321eab015 // indirect
+	gorm.io/datatypes v1.0.1
 	gorm.io/driver/mysql v1.0.6
 	gorm.io/gorm v1.21.9
 )
