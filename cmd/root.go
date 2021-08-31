@@ -74,11 +74,11 @@ func initConfig() {
 	// 设置文件的类型
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
-		panic(fmt.Sprintf("Read config error by %v \n",err))
+		panic(fmt.Sprintf("Read config error by %v \n", err))
 	}
 	var appConf appConf.AppConfig
 	if err :=viper.Unmarshal(&appConf); err !=nil{
-		panic(fmt.Sprintf("Unmarshal config error by %v \n",err))
+		panic(fmt.Sprintf("Unmarshal config error by %v \n", err))
 	}
 	globalConf.SetAppConfig(&appConf)
 }

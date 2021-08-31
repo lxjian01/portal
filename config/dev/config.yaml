@@ -5,7 +5,7 @@ httpd:
   port: 8010
 log:
   dir: "/tmp/logs"
-  name: "webshell.log"
+  name: "portal.log"
   format: ""
   retainDay: 3
   Level: "INFO"
