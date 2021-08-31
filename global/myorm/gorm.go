@@ -47,13 +47,12 @@ func InitDB() {
 }
 
 func GetOrmDB() *gorm.DB {
-	// conf := config.GetAppConfig()
-	return ormDB.Debug()
-	//if conf.Env != "prod" {
-	//	return ormDB.Debug()
-	//}else{
-	//	return ormDB
-	//}
+	conf := config.GetAppConfig()
+	if conf.Env != "prod" {
+		return ormDB.Debug()
+	}else{
+		return ormDB
+	}
 }
 
 func GetSqlDB() *sql.DB {
