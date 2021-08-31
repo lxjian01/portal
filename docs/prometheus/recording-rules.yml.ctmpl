@@ -1,0 +1,4 @@
+groups:
+- name: alerts
+  rules:{{range ls "/prometheus/portal/rule/recordings"}}
+{{.Value}}{{end}}

@@ -1,0 +1,154 @@
+# my global config
+global:
+  scrape_interval: 1m # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  scrape_timeout: 10s
+  evaluation_interval: 1m # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  external_labels:
+    pcode: 'portal'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: 
+      - 192.168.219.128:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "/etc/prometheus/recording-rules.yml"
+  - "/etc/prometheus/alerting-rules.yml"
+  - "/etc/prometheus/*.rules"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'consul-1m'
+    scrape_interval: 1m
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+        tags: ["portal-1m"]
+    relabel_configs:
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+
+  - job_name: 'consul-2m'
+    scrape_interval: 2m
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+        tags: ["portal-2m"]
+    relabel_configs:
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+
+  - job_name: 'consul-3m'
+    scrape_interval: 3m
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+        tags: ["portal-3m"]
+    relabel_configs:
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+
+  - job_name: 'consul-4m'
+    scrape_interval: 4m
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+        tags: ["portal-4m"]
+    relabel_configs:
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+
+  - job_name: 'consul-5m'
+    scrape_interval: 5m
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+        tags: ["portal-5m"]
+    relabel_configs:
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+
+  - job_name: 'blackbox-http_2xx'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: ["http_2xx"]
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_service_metadata_resource]
+        regex: 'http_2xx'
+        action: keep
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  - job_name: 'blackbox-http_post_2xx'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: ["http_post_2xx"]
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_service_metadata_resource]
+        regex: 'http_post_2xx'
+        action: keep
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  - job_name: 'blackbox-tcp_connect'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: ["tcp_connect"]
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_service_metadata_resource]
+        regex: 'tcp_connect'
+        action: keep
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
+
+  - job_name: 'blackbox-icmp'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: ["icmp"]
+    consul_sd_configs:
+      - server: '192.168.219.128:8500'
+    relabel_configs:
+      - source_labels: [__meta_consul_service_metadata_resource]
+        regex: 'icmp'
+        action: keep
+      - regex: __meta_consul_service_metadata_(.+)
+        action: labelmap
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115

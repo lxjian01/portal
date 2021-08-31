@@ -1,0 +1,17 @@
+[Unit]
+Description=Thanos compact service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/thanos-compact.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/thanos/thanos compact \
+  --objstore.config-file=/etc/thanos/objectstorage.yaml \
+  --data-dir=/data/thanos-compact \
+  --wait \
+  --http-address=0.0.0.0:10905
+Restart=always
+SyslogIdentifier=thanos-compact
+[Install]
+WantedBy=multi-user.target

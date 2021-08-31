@@ -1,0 +1,19 @@
+[Unit]
+Description=Thanos store service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/thanos-store.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/thanos/thanos store \
+  --objstore.config-file=/etc/thanos/objectstorage.yaml \
+  --data-dir=/data/thanos-store \
+  --index-cache-size=500MB \
+  --chunk-pool-size=2GB \
+  --grpc-address=0.0.0.0:10903 \
+  --http-address=0.0.0.0:10904
+Restart=always
+SyslogIdentifier=thanos-store
+[Install]
+WantedBy=multi-user.target

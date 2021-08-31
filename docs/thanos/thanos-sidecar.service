@@ -1,0 +1,19 @@
+[Unit]
+Description=Thanos sidecar service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/thanos-sidecar.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/thanos/thanos sidecar \
+  --objstore.config-file=/etc/thanos/objectstorage.yaml \
+  --tsdb.path=/data/prometheus \
+  --prometheus.url=http://localhost:9090 \
+  --grpc-address=0.0.0.0:10901 \
+  --http-address=0.0.0.0:10902 \
+  --shipper.upload-compacted
+Restart=always
+SyslogIdentifier=thanos-sidecar
+[Install]
+WantedBy=multi-user.target

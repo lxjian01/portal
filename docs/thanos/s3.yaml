@@ -1,0 +1,8 @@
+type: s3
+config:
+  bucket: thanos
+  endpoint: obs.lj.com:8080
+  access_key: accesskey
+  secret_key: secertkey
+  insecure: true
+  signature_version2: false

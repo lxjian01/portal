@@ -1,0 +1,21 @@
+[Unit]
+Description=Prometheus service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/prometheus.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/prometheus/prometheus \
+  --web.listen-address=:9090 \
+  --config.file=/etc/prometheus/prometheus.yml \
+  --storage.tsdb.path=/data/prometheus \
+  --web.enable-lifecycle \
+  --storage.tsdb.retention.time=7d \
+  --query.lookback-delta=10m \
+  --storage.tsdb.max-block-duration=2h \
+  --storage.tsdb.min-block-duration=2h
+Restart=always
+SyslogIdentifier=prometheus
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+groups:
+- name: alerts
+  rules:
+  - record: instance_disk_read_bytes_rate
+    expr: irate(node_disk_read_bytes_total{component="instance",device=~"^vd.*|^sd.*"}[5m])
+

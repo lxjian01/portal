@@ -1,0 +1,39 @@
+groups:
+- name: alerts
+  rules:
+  - alert: 'BlackboxProbeFailed_7'
+    expr: probe_success==0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: 'Blackbox probe failed'
+      description: 'Probe failed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}'
+
+  - alert: 'HostOutOfMemory_2'
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 > 80
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: '主机内存监控'
+      description: 'The host memory is used {{ $value }}\n  LABELS = {{ $labels }}'
+
+  - alert: 'HostOutOfMemory_3'
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 > 60
+    for: 1m
+    labels:
+      severity: minor
+    annotations:
+      summary: '主机内存监控'
+      description: 'The host memory is used {{ $value }}\n  LABELS = {{ $labels }}'
+
+  - alert: 'HostOutOfMemory_6'
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 > 90
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: '主机内存监控'
+      description: 'The host memory is used {{ $value }}\n  LABELS = {{ $labels }}'
+

@@ -1,0 +1,25 @@
+[Unit]
+Description=Thanos query service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/thanos-query.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/thanos/thanos query \
+  --grpc-address=0.0.0.0:10909 \
+  --http-address=0.0.0.0:9099 \
+  --query.auto-downsampling \
+  --query.partial-response \
+  --query.replica-label=prometheus_replica \
+  --query.replica-label=rule_replica \
+  --store=192.168.219.128:10901 \
+  --store=192.168.219.128:10903 \
+  --store=192.168.219.159:10906 \
+  --store=192.168.219.161:32480 \
+  --store=192.168.219.161:30916
+Restart=always
+SyslogIdentifier=thanos-query
+[Install]
+WantedBy=multi-user.target
+
