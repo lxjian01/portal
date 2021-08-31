@@ -1,0 +1,18 @@
+consul {
+    address = "192.168.219.128:8500"
+}
+pid_file = "/var/run/consul-template.pid"
+log_level = "INFO"
+template {
+    source = "/etc/prometheus/alerting-rules.yml.ctmpl"
+    destination = "/etc/prometheus/alerting-rules.yml"
+    command = "curl -X POST http://localhost:9090/-/reload"
+    command_timeout = "60s"
+}
+template {
+    source = "/etc/prometheus/recording-rules.yml.ctmpl"
+    destination = "/etc/prometheus/recording-rules.yml"
+    command = "curl -X POST http://localhost:9090/-/reload"
+    command_timeout = "60s"
+}
+

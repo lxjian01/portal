@@ -1,0 +1,13 @@
+[Unit]
+Description=Node exporter
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/node_exporter.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/node_exporter-0.17.0.linux-amd64/node_exporter 
+Restart=always
+SyslogIdentifier=node-exporter
+[Install]
+WantedBy=multi-user.target

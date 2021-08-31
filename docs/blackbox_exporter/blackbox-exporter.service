@@ -1,0 +1,14 @@
+[Unit]
+Description=Blackbox exporter
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/blackbox_exporter.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/blackbox_exporter-0.19.0.linux-amd64/blackbox_exporter \
+  --config.file /usr/local/monitor/blackbox_exporter-0.19.0.linux-amd64/blackbox.yml
+Restart=always
+SyslogIdentifier=blackbox-exporter
+[Install]
+WantedBy=multi-user.target

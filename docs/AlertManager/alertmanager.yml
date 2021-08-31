@@ -1,0 +1,30 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname','instance']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 30s
+  receiver: 'web.hook'
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://192.168.219.128:8010/api/portal/alarm/notice'
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'major'
+    equal: ['alertname','instance']
+  - source_match:
+      severity: 'major'
+    target_match:
+      severity: 'minor'
+    equal: ['alertname','instance']
+  - source_match:
+      severity: 'minor'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname','instance']
+

@@ -1,0 +1,19 @@
+[Unit]
+Description=Consul service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/consul.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/consul/consul agent \
+  -bind=192.168.219.128 \
+  -client=0.0.0.0 \
+  -data-dir=/data/consul \
+  -server \
+  -ui \
+  -bootstrap-expect=1
+Restart=always
+SyslogIdentifier=consul
+[Install]
+WantedBy=multi-user.target

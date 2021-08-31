@@ -1,0 +1,13 @@
+[Unit]
+Description=Consul template service
+After=network.target
+[Service]
+LimitNOFILE=65535
+Type=simple
+PIDFile=/var/run/consul-template.pid
+ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/monitor/consul/consul-template -config=/etc/consul/consul-template.json
+Restart=always
+SyslogIdentifier=consul-template
+[Install]
+WantedBy=multi-user.target
