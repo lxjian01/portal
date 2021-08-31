@@ -1,5 +1,5 @@
 # AlertManager
-versio: 0.21.0
+version: 0.21.0
 
 ## 参数说明：
 * group_b: 告警组名
