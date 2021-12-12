@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"portal/config"
+	"portal/global/config"
 	"sync"
 	"time"
 )

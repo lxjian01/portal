@@ -1,13 +1,47 @@
 package config
 
-import "portal/config"
+type AppConfig struct {
+	Version    string         `yaml:"version"`
+	Env        string         `yaml:"env"`
+	Httpd      *HttpdConfig   `yaml:"web"`
+	Log        *LogConfig     `yaml:"log"`
+	Mysql      *MysqlConfig   `yaml:"mysql"`
+	Consul *ConsulConfig   `yaml:"consul"`
+}
 
-var conf *config.AppConfig
+type HttpdConfig struct {
+	Host string
+	Port int
+}
 
-func SetAppConfig(c *config.AppConfig){
+type LogConfig struct {
+	Dir       string
+	Name      string
+	Format    string
+	RetainDay int8
+	Level     string
+}
+
+type MysqlConfig struct {
+	Host        string
+	Port        int
+	Db          string
+	User        string
+	Password    string
+	Charset     string
+}
+
+type ConsulConfig struct {
+	Host        string
+	Port        int
+}
+
+var conf *AppConfig
+
+func SetAppConfig(c *AppConfig){
 	conf = c
 }
 
-func GetAppConfig() *config.AppConfig {
+func GetAppConfig() *AppConfig {
 	return conf
 }

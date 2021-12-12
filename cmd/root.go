@@ -2,21 +2,23 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
-	"path/filepath"
-	appConf "portal/config"
+	appConf "portal/global/config"
 	globalConf "portal/global/config"
 	"portal/global/consul"
-	"portal/global/myorm"
 	"portal/global/log"
-	"portal/httpd"
+	"portal/global/myorm"
+	"portal/web"
 )
+
+var cfgFile string
 
 // 定义根命令
 var rootCmd = &cobra.Command{
-	Use: "kubernetes-demo-go",
+	Use: "portal",
 	Run: func(cmd *cobra.Command, args []string) {
 		conf := globalConf.GetAppConfig()
 		defer func() {
@@ -25,22 +27,22 @@ var rootCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}()
-		fmt.Println("Starting init sysmgr log")
+		fmt.Println("Starting init log")
 		log.Init(conf.Log)
-		fmt.Println("Init sysmgr log ok")
+		fmt.Println("Init log ok")
 
-		fmt.Println("Starting init myorm")
+		fmt.Println("Starting init gorm")
 		myorm.InitDB()
 		defer myorm.CloseDB()
-		fmt.Println("Init myorm ok")
+		fmt.Println("Init gorm ok")
 
 		fmt.Println("Starting init consul client")
 		consul.InitConsul()
 		fmt.Println("Init consul client ok")
 
 		// init gin server
-		log.Info("Starting init gin server")
-		httpd.StartHttpdServer(conf.Httpd)
+		log.Info("Starting gin server")
+		web.StartServer(conf.Httpd)
 		log.Info("Start gin server ok")
 	},
 }
@@ -49,6 +51,8 @@ var rootCmd = &cobra.Command{
 func init() {
 	// 初始化配置文件转化成对应的结构体
 	cobra.OnInitialize(initConfig)
+	// config file like --config=/opt/code/portal/config/portal.yaml
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "default is $HOME/portal.yaml")
 }
 
 // 启动调用的入口方法
@@ -61,24 +65,31 @@ func Execute() {
 
 //通过viper初始化配置文件到结构体
 func initConfig() {
-	dir,_ := os.Getwd()
-	env := os.Getenv("ENV")
-	if env == ""{
-		env = "dev"
+	if cfgFile != "" {
+		// use config file from the flag
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// find home directory
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Printf("find home dir error by %s \n", err.Error())
+			os.Exit(1)
+		}
+		// 设置读取的文件路径
+		viper.AddConfigPath(home)
+		// 设置读取的文件名
+		viper.SetConfigName("config")
+		// 设置文件的类型
+		viper.SetConfigType("yaml")
 	}
-	configPath := filepath.Join(dir,"config/"+env)
-	// 设置读取的文件路径
-	viper.AddConfigPath(configPath)
-	// 设置读取的文件名
-	viper.SetConfigName("config")
-	// 设置文件的类型
-	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {
-		panic(fmt.Sprintf("Read config error by %v \n", err))
+		fmt.Printf("Read config error by %v \n", err)
+		os.Exit(1)
 	}
 	var appConf appConf.AppConfig
 	if err :=viper.Unmarshal(&appConf); err !=nil{
-		panic(fmt.Sprintf("Unmarshal config error by %v \n", err))
+		fmt.Printf("Unmarshal config error by %v \n", err)
+		os.Exit(1)
 	}
 	globalConf.SetAppConfig(&appConf)
 }
