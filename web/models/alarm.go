@@ -155,3 +155,10 @@ type AlertManagerNotice struct {
 	ExternalUrl string `json:"externalUrl"`
 	Alerts []Alert `json:"alerts"`
 }
+
+type PrometheusAlertingRuleList struct {
+	AlertingRuleId int `gorm:"column:alerting_rule_id" json:"alertingRuleId"`
+	PrometheusId int `gorm:"column:prometheus_id" json:"prometheusId"`
+	PrometheusCode string `gorm:"column:prometheus_code" json:"prometheusCode"`
+	PrometheusName string `gorm:"column:prometheus_name" json:"prometheusName"`
+}

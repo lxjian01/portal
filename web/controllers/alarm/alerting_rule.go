@@ -19,7 +19,8 @@ func AddAlertingRule(c *gin.Context){
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := alarm.AddAlertingRule(&m)
+	service := alarm.AlertingRuleService{}
+	_, err := service.AddAlertingRule(&m)
 	if err != nil {
 		log.Errorf("Add alarm rule error %s",err.Error())
 		resp.ToError(c, err)
@@ -37,7 +38,8 @@ func UpdateAlertingRule(c *gin.Context){
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := alarm.UpdateAlertingRule(&m)
+	service := alarm.AlertingRuleService{}
+	err := service.UpdateAlertingRule(&m)
 	if err != nil {
 		log.Errorf("Update alerting rule id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
@@ -54,7 +56,8 @@ func DeleteAlertingRule(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	err = alarm.DeleteAlertingRule(id)
+	service := alarm.AlertingRuleService{}
+	err = service.DeleteAlertingRule(id)
 	if err != nil {
 		log.Errorf("Delete alerting rule id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
@@ -99,7 +102,8 @@ func GetAlertingRulePage(c *gin.Context){
 		return
 	}
 	keywords := c.Query("keywords")
-	data, err := alarm.GetAlertingRulePage(pageIndex, pageSize, prometheusId, exporter, alertingMetricId, keywords)
+	service := alarm.AlertingRuleService{}
+	data, err := service.GetAlertingRulePage(pageIndex, pageSize, prometheusId, exporter, alertingMetricId, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return

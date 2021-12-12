@@ -19,7 +19,8 @@ func AddAlertingMetric(c *gin.Context){
 	}
 	m.CreateUser = middlewares.GetLoginUser().UserCode
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	_, err := alarm.AddAlertingMetric(&m)
+	service := alarm.AlertingMetricService{}
+	_, err := service.AddAlertingMetric(&m)
 	if err != nil {
 		log.Errorf("Add alarm metric error %s",err.Error())
 		resp.ToError(c, err)
@@ -37,7 +38,8 @@ func UpdateAlertingMetric(c *gin.Context){
 		return
 	}
 	m.UpdateUser = middlewares.GetLoginUser().UserCode
-	err := alarm.UpdateAlertingMetric(&m)
+	service := alarm.AlertingMetricService{}
+	err := service.UpdateAlertingMetric(&m)
 	if err != nil {
 		log.Errorf("Update alarm metric id=%d error %s", m.Id, err.Error())
 		resp.ToError(c, err)
@@ -54,7 +56,8 @@ func DeleteAlertingMetric(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	_, err = alarm.DeleteAlertingMetric(id)
+	service := alarm.AlertingMetricService{}
+	_, err = service.DeleteAlertingMetric(id)
 	if err != nil {
 		log.Errorf("Delete alarm metric id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
@@ -71,7 +74,8 @@ func GetAlertingMetricDetail(c *gin.Context){
 		resp.ToMsgBadRequest(c, "参数id必须是整数")
 		return
 	}
-	data, err := alarm.GetAlertingMetricDetail(id)
+	service := alarm.AlertingMetricService{}
+	data, err := service.GetAlertingMetricDetail(id)
 	if err != nil {
 		log.Errorf("Get alerting metric detail id=%d error %s", id, err.Error())
 		resp.ToError(c, err)
@@ -84,7 +88,8 @@ func GetAlertingMetricDetail(c *gin.Context){
 func GetAlertingMetricList(c *gin.Context){
 	resp := &utils.Response{}
 	exporter := c.Query("exporter")
-	data, err := alarm.GetAlertingMetricList(exporter)
+	service := alarm.AlertingMetricService{}
+	data, err := service.GetAlertingMetricList(exporter)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
@@ -117,7 +122,8 @@ func GetAlertingMetricPage(c *gin.Context){
 	}
 	exporter := c.Query("exporter")
 	keywords := c.Query("keywords")
-	data, err := alarm.GetAlertingMetricPage(pageIndex, pageSize, exporter, keywords)
+	service := alarm.AlertingMetricService{}
+	data, err := service.GetAlertingMetricPage(pageIndex, pageSize, exporter, keywords)
 	if err != nil {
 		resp.ToMsgBadRequest(c, err.Error())
 		return
