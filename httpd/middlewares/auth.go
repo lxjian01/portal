@@ -24,8 +24,8 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		loginUser = &LoginUser{
 			UserId: 1,
-			UserCode: "jian.li",
-			UserName: "李健",
+			UserCode: "jason",
+			UserName: "jason",
 			Phone: "xxx",
 			Email: "xxx",
 			IsSuper: true,
